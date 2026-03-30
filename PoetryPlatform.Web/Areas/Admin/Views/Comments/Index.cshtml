@@ -1,0 +1,42 @@
+﻿@model IEnumerable<PoetryPlatform.Web.Models.AdminCommentVm>
+
+@{
+    ViewData["Title"] = "Comment Moderation";
+}
+
+<h2>Comment Moderation</h2>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Comment</th>
+            <th>Poem</th>
+            <th>Author</th>
+            <th>Commenter</th>
+            <th>Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr class="@(c.IsFlagged ? "table-warning" : "")">
+                <td>@c.Content</td>
+                <td>@c.PoemTitle</td>
+                <td>@c.AuthorName</td>
+                <td>@c.CommenterEmail</td>
+                <td>@c.CreatedAt.ToLocalTime()</td>
+                <td>
+                    @if (c.IsFlagged)
+                    {
+                        <span class="badge bg-danger">Flagged</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Clean</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

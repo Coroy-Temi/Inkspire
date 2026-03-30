@@ -1,0 +1,65 @@
+﻿@model List<PoetryPlatform.Web.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<h2>User Management</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Author Name</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            var isLocked =
+            user.LockoutEnd != null &&
+            user.LockoutEnd > DateTimeOffset.UtcNow;
+
+            <tr>
+                <td>@user.Email</td>
+                <td>@user.AuthorName</td>
+                <td>@user.PhoneNumber</td>
+                <td>
+                    @if (isLocked)
+                    {
+                        <span class="badge bg-danger">Locked</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                </td>
+                <td>
+                    @if (isLocked)
+                    {
+                        <form asp-action="UnlockUser" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@user.Id" />
+                            <button class="btn btn-sm btn-success">
+                                Unlock
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-action="LockUser" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@user.Id" />
+                            <button class="btn btn-sm btn-danger">
+                                Lock
+                            </button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

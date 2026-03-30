@@ -1,0 +1,58 @@
+﻿@model PoetryPlatform.Web.Models.Poem
+
+@{
+    ViewData["Title"] = "Create Writing";
+}
+
+<h2>Create Writing</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label>Title</label>
+        <input asp-for="Title" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Content</label>
+        <textarea asp-for="Content" class="form-control" rows="8"></textarea>
+    </div>
+
+    <!-- ========================= -->
+    <!-- PDF UPLOAD (OPTIONAL) -->
+    <!-- ========================= -->
+    <div class="mb-3">
+        <label>Upload PDF (optional)</label>
+        <input type="file" name="pdfFile" class="form-control" accept="application/pdf" />
+        <small class="text-muted">
+            Use PDF for long poems, books, or formatted works.
+        </small>
+    </div>
+
+    <!-- ========================= -->
+    <!-- FUTURE FEATURES (PARKED) -->
+    <!-- ========================= -->
+    <!--
+    <div class="mb-3">
+        <label>Access Type</label>
+        <select class="form-control">
+            <option>Free</option>
+            <option>Paid</option>
+            <option>External</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Price</label>
+        <input class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>External Purchase URL</label>
+        <input class="form-control" />
+    </div>
+    -->
+
+    <button type="submit" class="btn btn-success">Publish</button>
+</form>

@@ -1,0 +1,57 @@
+﻿@model IEnumerable<PoetryPlatform.Web.Models.WriterPoemVm>
+
+@{
+    ViewData["Title"] = "My Writings";
+}
+
+<h2>My Writings</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">New Writing</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Views</th>
+            <th>Likes</th>
+
+            @* Future monetization *@
+            @* <th>Access</th> *@
+
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var poem in Model)
+        {
+            <tr>
+                <td>@poem.Title</td>
+                <td>@poem.Views</td>
+                <td>@poem.Likes</td>
+
+                @* Future monetization *@
+                @* <td>@poem.AccessType</td> *@
+
+                <td>
+                    <a asp-action="Edit"
+                       asp-route-id="@poem.Id"
+                       class="btn btn-sm btn-warning">
+                        Edit
+                    </a>
+
+                    <form asp-action="Delete"
+                          asp-route-id="@poem.Id"
+                          method="post"
+                          style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit"
+                                class="btn btn-sm btn-danger"
+                                onclick="return confirm('Delete this writing?');">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

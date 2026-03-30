@@ -1,0 +1,130 @@
+﻿@model PoetryPlatform.Web.Models.Poem
+@using System.Security.Claims
+
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<link href="~/css/read.css" rel="stylesheet" />
+
+<div class="reader-container">
+    <h2 class="reader-title">@Model.Title</h2>
+
+    <p class="reader-author">
+        by @(string.IsNullOrWhiteSpace(Model.Author?.AuthorName)
+                ? Model.Author?.UserName
+                : Model.Author?.AuthorName)
+    </p>
+
+    <div class="reader-box">
+
+        @if (!string.IsNullOrEmpty(Model.Content))
+        {
+            <div class="poem-text">
+                @Html.Raw(Model.Content.Replace("\n", "<br />"))
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.PdfPath))
+        {
+            <iframe src="@Model.PdfPath"
+                    class="pdf-viewer"
+                    loading="lazy">
+            </iframe>
+        }
+
+        <!-- LIKE BUTTON -->
+        <form asp-action="ToggleLike" method="post" class="mt-3">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="poemId" value="@Model.Id" />
+
+            <button type="submit"
+                    class="btn @(ViewBag.UserHasLiked ? "btn-danger" : "btn-outline-danger")">
+                ❤️ @(ViewBag.UserHasLiked ? "Unlike" : "Like")
+            </button>
+        </form>
+
+        <p class="text-muted mt-2">
+            ❤️ @ViewBag.LikeCount likes
+        </p>
+    </div>
+
+    <!-- COMMENTS -->
+    <div class="comments-section mt-4">
+        <h4>Comments (@Model.Comments.Count)</h4>
+
+        <form asp-action="AddComment" method="post" class="mb-3">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="poemId" value="@Model.Id" />
+
+            <textarea name="content"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Write a comment..."
+                      required></textarea>
+
+            <button type="submit" class="btn btn-primary mt-2">
+                Post Comment
+            </button>
+        </form>
+
+        @if (Model.Comments.Any(c => !c.IsDeleted))
+        {
+            @foreach (var comment in Model.Comments
+                    .Where(c => !c.IsDeleted)
+                    .OrderByDescending(c => c.CreatedAt))
+
+            {
+                <div class="comment-box mb-3">
+
+                    <div class="d-flex justify-content-between">
+                        <strong>
+                            @(string.IsNullOrWhiteSpace(comment.User?.AuthorName)
+                                                ? comment.User?.UserName
+                                                : comment.User?.AuthorName)
+                </strong>
+
+                @if (
+                       User.IsInRole("Admin") ||
+                       Model.AuthorId == User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier)
+                                )
+                        {
+                            <form asp-action="DeleteComment"
+                                  method="post"
+                                  class="ms-2">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="commentId" value="@comment.Id" />
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Delete this comment?');">
+                                    Delete
+                                </button>
+                            </form>
+                        }
+                    </div>
+
+                    <small class="text-muted d-block">
+                        @comment.CreatedAt.ToLocalTime().ToString("g")
+                    </small>
+
+                    <p class="mb-0">@comment.Content</p>
+
+                    <form asp-action="FlagComment" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="commentId" value="@comment.Id" />
+                        <button class="btn btn-sm btn-outline-danger">
+                            🚩 Flag
+                        </button>
+                    </form>
+
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-muted">No comments yet.</p>
+        }
+    </div>
+</div>

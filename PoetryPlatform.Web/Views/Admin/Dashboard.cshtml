@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2>Admin Dashboard</h2>
+
+<ul>
+    <li>
+        <a asp-controller="Writer" asp-action="Poems">
+            ✍ Manage My Writings
+        </a>
+    </li>
+
+    <li>
+        <a asp-controller="Poems" asp-action="Index">
+            📖 View Public Poems
+        </a>
+    </li>
+
+    <li>
+        <a href="#">
+            🚨 Reports & Complaints (coming soon)
+        </a>
+    </li>
+</ul>

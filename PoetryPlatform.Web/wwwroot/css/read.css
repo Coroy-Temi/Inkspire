@@ -1,0 +1,132 @@
+﻿/* =========================
+   THEME VARIABLES (LIGHT)
+   ========================= */
+
+:root {
+    --bg-main: #fffaf5;
+    --bg-card: #ffffff;
+    --text-main: #212529;
+    --text-muted: #6c757d;
+    --primary: #ff7a18;
+    --primary-soft: #fff1e6;
+    --primary-hover: #e56700;
+    --border-soft: rgba(0,0,0,0.08);
+    --shadow-soft: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* =========================
+   BASE
+   ========================= */
+
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    margin-bottom: 60px;
+}
+
+/* =========================
+   LINKS
+   ========================= */
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+    a:hover {
+        color: var(--primary-hover);
+        text-decoration: underline;
+    }
+
+/* =========================
+   NAVBAR
+   ========================= */
+
+.navbar {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-soft);
+    box-shadow: var(--shadow-soft);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.nav-link {
+    font-weight: 500;
+}
+
+/* =========================
+   CARDS
+   ========================= */
+
+.card {
+    background: var(--bg-card);
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--shadow-soft);
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+
+.btn-outline-primary {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary);
+        color: #fff;
+    }
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+    }
+
+/* =========================
+   FORMS
+   ========================= */
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.15rem rgba(255,122,24,0.25);
+}
+
+/* =========================
+   COMMENTS
+   ========================= */
+
+.comment {
+    background: var(--primary-soft);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+}
+
+/* =========================
+   RANK
+   ========================= */
+
+.rank-badge {
+    font-size: 1.6rem;
+}

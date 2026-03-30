@@ -1,0 +1,49 @@
+﻿@model IEnumerable<PoetryPlatform.Web.Models.Comment>
+
+<h2>🚩 Flagged Comments</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Poem</th>
+            <th>Comment</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var comment in Model)
+        {
+            <tr>
+                <td>@comment.Poem.Title</td>
+                <td>@comment.Content</td>
+                <td>@comment.CreatedAt.ToLocalTime()</td>
+                <td>
+                    <form asp-action="DeleteComment"
+                          method="post"
+                          class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@comment.Id" />
+                        <button class="btn btn-sm btn-danger">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="RestoreComment"
+                          method="post"
+                          class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@comment.Id" />
+
+                        <button class="btn btn-sm btn-success">
+                            ♻ Restore
+                        </button>
+                    </form>
+
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>

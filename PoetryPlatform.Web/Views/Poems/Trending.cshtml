@@ -1,0 +1,28 @@
+﻿@model List<PoetryPlatform.Web.Models.TrendingPoemVm>
+
+<h2 class="mb-4">🔥 Trending Poems</h2>
+
+@foreach (var poem in Model)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5>@poem.Title</h5>
+            <small class="text-muted">
+                by @poem.AuthorName • @poem.CreatedAt.ToShortDateString()
+            </small>
+
+            <div class="mt-2">
+                👁 @poem.UniqueReaders
+                ❤️ @poem.Likes
+                💬 @poem.Comments
+                <span class="badge bg-dark ms-2">Score: @poem.Score</span>
+            </div>
+
+            <a asp-action="Read"
+               asp-route-id="@poem.Id"
+               class="btn btn-sm btn-outline-primary mt-2">
+                Read
+            </a>
+        </div>
+    </div>
+}

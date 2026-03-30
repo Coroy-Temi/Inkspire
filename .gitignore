@@ -1,0 +1,10 @@
+.vs/
+.appdata/
+.dotnet-home/
+.localappdata/
+.nuget/
+NuGet.Config
+**/bin/
+**/obj/
+**/*.db
+**/*.user

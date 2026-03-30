@@ -1,0 +1,14 @@
+﻿<h2>Add Admin</h2>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label>Email</label>
+        <input name="email" class="form-control" />
+    </div>
+
+    <button class="btn btn-danger">
+        Grant Admin Access
+    </button>
+</form>

@@ -1,0 +1,28 @@
+﻿@model IEnumerable<PoetryPlatform.Web.Models.Poem>
+
+<h1>Poems</h1>
+
+<link href="~/css/crazy.css" rel="stylesheet" />
+@foreach (var poem in Model)
+{
+    <div class="poem-card">
+        <h2>@poem.Title</h2>
+
+        @if (poem.AccessType == ContentAccessType.PlatformPaid)
+        {
+            <span>💰 Paid</span>
+        }
+        else if (poem.AccessType == ContentAccessType.ExternalLink)
+        {
+            <span>🔗 External</span>
+        }
+        else
+        {
+            <span>🆓 Free</span>
+        }
+
+        <br />
+
+        <a asp-action="Read" asp-route-id="@poem.Id">Read</a>
+    </div>
+}
