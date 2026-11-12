@@ -1,0 +1,55 @@
+@model IEnumerable<PoetryPlatform.Web.Models.MostCommentedPoemVm>
+
+@{
+    ViewData["Title"] = "Most Commented Poems";
+}
+
+<section class="page-hero page-hero--compact">
+    <div>
+        <span class="eyebrow">Conversation ranking</span>
+        <h1>The poems generating the most discussion.</h1>
+        <p class="lead-copy">Use this view to surface the pieces readers are responding to most deeply.</p>
+    </div>
+</section>
+
+<div class="filter-pills mb-4">
+    <a asp-action="MostCommented" asp-route-days="0" class="pill-button @(ViewBag.Days == 0 ? "active" : "")">All time</a>
+    <a asp-action="MostCommented" asp-route-days="7" class="pill-button @(ViewBag.Days == 7 ? "active" : "")">Last 7 days</a>
+    <a asp-action="MostCommented" asp-route-days="30" class="pill-button @(ViewBag.Days == 30 ? "active" : "")">Last 30 days</a>
+</div>
+
+@if (!Model.Any())
+{
+    <p class="empty-state">No poems have comments yet.</p>
+}
+else
+{
+    <div class="stack-list">
+        @foreach (var poem in Model)
+        {
+            var avatarText = string.IsNullOrWhiteSpace(poem.AuthorName) ? "I" : poem.AuthorName.Substring(0, 1).ToUpperInvariant();
+            <article class="stack-card stack-card--large">
+                <div class="stack-card__topline">
+                    <span class="rank-chip">#@poem.Rank</span>
+                    <span class="muted-mini">@poem.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span>
+                </div>
+                <h2>@poem.Title</h2>
+                <div class="author-line">
+                    @if (!string.IsNullOrWhiteSpace(poem.AuthorProfileImagePath))
+                    {
+                        <img src="@poem.AuthorProfileImagePath" alt="@poem.AuthorName" class="author-avatar" />
+                    }
+                    else
+                    {
+                        <span class="author-avatar author-avatar--fallback">@avatarText</span>
+                    }
+                    <p class="card-meta">by @poem.AuthorName</p>
+                </div>
+                <div class="metric-row">
+                    <span>@poem.CommentCount comments</span>
+                </div>
+                <a asp-controller="Poems" asp-action="Read" asp-route-id="@poem.Id" class="link-cta">Read and respond</a>
+            </article>
+        }
+    </div>
+}

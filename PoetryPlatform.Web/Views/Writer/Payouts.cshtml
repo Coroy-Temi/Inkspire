@@ -1,0 +1,214 @@
+@model PoetryPlatform.Web.Models.Payments.AuthorPayoutDashboardVm
+@using PoetryPlatform.Web.Models.Payments
+
+@{
+    ViewData["Title"] = "Payouts";
+    var statusMessage = TempData["WriterPayoutStatusMessage"] as string;
+    var selectedBankCode = Model.PayoutAccount?.BankCode;
+    var routingCopy = Model.CheckoutRoutingMode switch
+    {
+        CheckoutRoutingMode.AuthorPreference => "Reader checkout follows each author's preferred provider when possible, then falls back intelligently.",
+        CheckoutRoutingMode.AuthorCountry => "Reader checkout can follow the author's country so supported regions can stay grounded in Paystack-first commerce.",
+        _ => "Reader checkout follows the platform default first, with fallback to any configured provider."
+    };
+}
+
+@if (!string.IsNullOrWhiteSpace(statusMessage))
+{
+    <div class="notice-card mb-4">
+        <strong>Payout update</strong>
+        <p class="mb-0">@statusMessage</p>
+    </div>
+}
+
+<section class="page-hero page-hero--compact">
+    <div>
+        <span class="eyebrow">Author payments</span>
+        <h1>Set up your Paystack-focused selling profile and watch earnings build.</h1>
+        <p class="lead-copy">@routingCopy</p>
+    </div>
+    <div class="hero-actions">
+        <form asp-action="RefreshPayoutStatus" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-brand">Refresh Paystack profile</button>
+        </form>
+    </div>
+</section>
+
+<div class="notice-card mb-4">
+    <strong>Active checkout provider: @Model.EffectiveCheckoutProvider</strong>
+    <p class="mb-0">Paystack can now split reader payments into your connected subaccount while Inkspire keeps the platform fee. Transfer recipients are also stored here for bonus and batch payouts.</p>
+</div>
+
+<div class="stats-grid stats-grid--three">
+    <article class="stat-card">
+        <strong>@Model.PendingEarningsAmount.ToString("0.##")</strong>
+        <span>@Model.PendingEarningsCount pending earnings</span>
+    </article>
+    <article class="stat-card">
+        <strong>@Model.AvailableEarningsAmount.ToString("0.##")</strong>
+        <span>@Model.AvailableEarningsCount available for payout</span>
+    </article>
+    <article class="stat-card">
+        <strong>@Model.PaidEarningsAmount.ToString("0.##")</strong>
+        <span>@Model.PaidEarningsCount already paid out</span>
+    </article>
+</div>
+
+<section class="two-column-section">
+    <div class="glass-card editor-form">
+        <span class="eyebrow">Checkout routing</span>
+        <h2>Set your author commerce profile</h2>
+        <form asp-action="SavePayoutSettings" method="post" class="settings-grid">
+            @Html.AntiForgeryToken()
+            <div>
+                <label class="form-label" for="countryCode">Author country</label>
+                <input id="countryCode" name="countryCode" value="@Model.CountryCode" class="form-control" maxlength="8" placeholder="US" />
+            </div>
+            <div>
+                <label class="form-label" for="preferredCheckoutProvider">Preferred checkout provider</label>
+                <select id="preferredCheckoutProvider" name="preferredCheckoutProvider" class="form-select">
+                    <option value="">Follow routing rule</option>
+                    @foreach (var provider in Enum.GetValues<PaymentProviderType>())
+                    {
+                        <option value="@provider" selected="@(Model.PreferredCheckoutProvider == provider ? "selected" : null)">@provider</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="form-label" for="businessName">Business or pen name</label>
+                <input id="businessName" name="businessName" value="@(Model.PayoutAccount?.BusinessName ?? Model.DisplayName)" class="form-control" />
+            </div>
+            <div>
+                <label class="form-label" for="bankCode">Settlement bank</label>
+                <select id="bankCode" name="bankCode" class="form-select">
+                    <option value="">Choose bank</option>
+                    @foreach (var bank in Model.SupportedBanks)
+                    {
+                        <option value="@bank.Code" selected="@(string.Equals(selectedBankCode, bank.Code, StringComparison.OrdinalIgnoreCase) ? "selected" : null)">@bank.Name (@bank.Code)</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="form-label" for="accountNumber">Account number</label>
+                <input id="accountNumber" name="accountNumber" value="@Model.PayoutAccount?.AccountNumber" class="form-control" inputmode="numeric" />
+            </div>
+            <div>
+                <label class="form-label">Account name</label>
+                <input class="form-control" value="@(Model.PayoutAccount?.AccountName ?? "Will be verified with Paystack")" disabled />
+            </div>
+            <div class="settings-grid__full">
+                <button type="submit" class="btn btn-brand">Save payout settings</button>
+            </div>
+        </form>
+
+        <div class="notice-card mt-4">
+            <strong>How automation works now</strong>
+            <p class="mb-0">Saving this form verifies your bank details, creates a Paystack transfer recipient, and creates or updates your Paystack subaccount. New reader purchases can then split automatically into your settlement profile.</p>
+        </div>
+
+        <div class="detail-grid mt-4">
+            <article class="notice-card">
+                <strong>Paystack checkout</strong>
+                <p class="mb-0">@(Model.PaystackCheckoutConfigured ? "Configured and ready for live reader checkout." : "Not configured yet on this environment.")</p>
+            </article>
+            <article class="notice-card">
+                <strong>Paystack transfers</strong>
+                <p class="mb-0">@(Model.PaystackTransfersConfigured ? "Ready for bonus and batch payouts from your Inkspire balance." : "Not configured yet on this environment.")</p>
+            </article>
+            <article class="notice-card">
+                <strong>Future subscriptions</strong>
+                <p class="mb-0">@(Model.ReaderSubscriptionsEnabled ? "Reader subscriptions are enabled in the current payment options." : "Reader subscriptions are schema-ready and can be switched on later.")</p>
+            </article>
+            <article class="notice-card">
+                <strong>Stripe parked</strong>
+                <p class="mb-0">@(Model.StripeCheckoutConfigured || Model.StripePayoutConfigured ? "Stripe code is still present in the project but intentionally not used for the active flow." : "Stripe is inactive in the current setup and left parked for later expansion.")</p>
+            </article>
+        </div>
+    </div>
+
+    <div class="glass-card editor-form">
+        <span class="eyebrow">Payout readiness</span>
+        <h2>Paystack-ready profile</h2>
+        <div class="stack-list">
+            <article class="stack-card">
+                <div class="stack-card__topline">
+                    <span class="pill-label">@(Model.PayoutAccount?.Status.ToString() ?? "NotStarted")</span>
+                    <span class="badge-soft">@Model.PayoutProvider</span>
+                </div>
+                <h3>@Model.DisplayName</h3>
+                <p class="card-meta">Country: @Model.CountryCode</p>
+                <div class="metric-row">
+                    <span>Charges @(Model.PayoutAccount?.ChargesEnabled == true ? "enabled" : "pending")</span>
+                    <span>Payouts @(Model.PayoutAccount?.PayoutsEnabled == true ? "enabled" : "pending")</span>
+                    <span>Details @(Model.PayoutAccount?.DetailsSubmitted == true ? "submitted" : "needed")</span>
+                </div>
+                <div class="metric-row mt-2">
+                    <span>Currency @(Model.PayoutAccount?.Currency?.ToUpperInvariant() ?? Model.Currency.ToUpperInvariant())</span>
+                    <span>Recipient @(string.IsNullOrWhiteSpace(Model.PayoutAccount?.PaystackRecipientCode) ? "pending" : "connected")</span>
+                    <span>Subaccount @(string.IsNullOrWhiteSpace(Model.PayoutAccount?.PaystackSubaccountCode) ? "pending" : "connected")</span>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.PayoutAccount?.RequirementsSummary))
+                {
+                    <div class="notice-card mt-3">
+                        <strong>Still needed</strong>
+                        <p class="mb-0">@Model.PayoutAccount.RequirementsSummary</p>
+                    </div>
+                }
+            </article>
+            <article class="stack-card">
+                <h3>How Inkspire splits sales</h3>
+                <p class="card-meta">Reader payments create an order, send the platform fee to Inkspire, and route the author share through your Paystack subaccount when your settlement profile is active.</p>
+                <div class="metric-row">
+                    <span>Email: @Model.Email</span>
+                    <span>Plans prepared: @Model.SubscriptionPlanCount</span>
+                    <span>Active reader subscriptions: @Model.ActiveReaderSubscriptions</span>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.PayoutAccount?.PaystackSubaccountCode) || !string.IsNullOrWhiteSpace(Model.PayoutAccount?.PaystackRecipientCode))
+                {
+                    <div class="metric-row mt-2">
+                        <span>Subaccount: @(Model.PayoutAccount?.PaystackSubaccountCode ?? "Pending")</span>
+                        <span>Recipient: @(Model.PayoutAccount?.PaystackRecipientCode ?? "Pending")</span>
+                    </div>
+                }
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Recent earnings</span>
+            <h2>What your last reader payments created</h2>
+        </div>
+    </div>
+    @if (Model.RecentEarnings.Count == 0)
+    {
+        <div class="empty-state">Your paid orders will start appearing here as soon as readers complete purchases.</div>
+    }
+    else
+    {
+        <div class="stack-list">
+            @foreach (var earning in Model.RecentEarnings)
+            {
+                <article class="stack-card">
+                    <div class="stack-card__topline">
+                        <span class="pill-label">@earning.Status</span>
+                        <span class="badge-soft">@earning.EarnedAt.ToLocalTime().ToString("dd MMM yyyy")</span>
+                    </div>
+                    <h3>@earning.Title</h3>
+                    <p class="card-meta">Order @earning.OrderNumber</p>
+                    <div class="metric-row">
+                        <span>Gross @earning.GrossAmount.ToString("0.##") @earning.Currency.ToUpperInvariant()</span>
+                        <span>Net @earning.NetAmount.ToString("0.##") @earning.Currency.ToUpperInvariant()</span>
+                        @if (earning.PaidAt.HasValue)
+                        {
+                            <span>Settled @earning.PaidAt.Value.ToLocalTime().ToString("dd MMM yyyy")</span>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</section>

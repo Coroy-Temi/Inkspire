@@ -1,0 +1,73 @@
+@model PoetryPlatform.Web.Models.Payments.PurchaseHistoryVm
+@using PoetryPlatform.Web.Models.Payments
+
+@{
+    ViewData["Title"] = "Purchase History";
+}
+
+<section class="page-hero page-hero--compact">
+    <div>
+        <span class="eyebrow">Purchase history</span>
+        <h1>Your receipts and completed book purchases.</h1>
+        <p class="lead-copy">Every checkout stays available here so readers can revisit receipts and reopen purchased titles later.</p>
+    </div>
+</section>
+
+@if (!Model.Orders.Any())
+{
+    <div class="empty-state">No purchases yet. When you unlock a paid title on Inkspire, it will appear here.</div>
+}
+else
+{
+    <div class="purchase-history-grid">
+        @foreach (var order in Model.Orders)
+        {
+            var avatarText = string.IsNullOrWhiteSpace(order.AuthorName) ? "I" : order.AuthorName.Substring(0, 1).ToUpperInvariant();
+            var statusClass = order.Status switch
+            {
+                OrderStatus.Paid => "badge-soft",
+                OrderStatus.Failed => "pill-label",
+                OrderStatus.Cancelled => "rank-chip",
+                _ => "pill-label"
+            };
+
+            <article class="purchase-card">
+                <div class="purchase-card__header">
+                    <div>
+                        <span class="@statusClass">@order.Status</span>
+                        <h2>@order.Title</h2>
+                    </div>
+                    <span class="muted-mini">@order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span>
+                </div>
+
+                <div class="author-line">
+                    @if (!string.IsNullOrWhiteSpace(order.AuthorProfileImagePath))
+                    {
+                        <img src="@order.AuthorProfileImagePath" alt="@order.AuthorName" class="author-avatar" />
+                    }
+                    else
+                    {
+                        <span class="author-avatar author-avatar--fallback">@avatarText</span>
+                    }
+                    <p class="card-meta">by @order.AuthorName</p>
+                </div>
+
+                <div class="receipt-grid receipt-grid--compact">
+                    <div>
+                        <dt>Order</dt>
+                        <dd>@order.OrderNumber</dd>
+                    </div>
+                    <div>
+                        <dt>Total</dt>
+                        <dd>@order.Currency.ToUpperInvariant() @order.GrossAmount.ToString("0.##")</dd>
+                    </div>
+                </div>
+
+                <div class="card-footer-row">
+                    <a class="btn btn-brand btn-brand--ghost" asp-action="Receipt" asp-route-orderId="@order.OrderId">View receipt</a>
+                    <a class="btn btn-brand" asp-controller="Poems" asp-action="Read" asp-route-id="@order.PoemId">Open title</a>
+                </div>
+            </article>
+        }
+    </div>
+}

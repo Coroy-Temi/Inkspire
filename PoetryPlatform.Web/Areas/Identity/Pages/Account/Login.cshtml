@@ -1,0 +1,59 @@
+@page
+@model PoetryPlatform.Web.Areas.Identity.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Login";
+    ViewData["PageClass"] = "auth-shell";
+}
+
+<section class="auth-layout">
+    <div class="auth-story">
+        <span class="eyebrow">Welcome back</span>
+        <h1>Step back into your reading room.</h1>
+        <p class="lead-copy">Pick up where you left off, discover what is trending, and manage your author profile in a home shaped for serious readers and writers.</p>
+        <div class="auth-benefits">
+            <div class="notice-card">
+                <strong>For readers</strong>
+                <p class="mb-0">Jump into trending pieces, thoughtful comments, and enjoy.</p>
+            </div>
+            <div class="notice-card">
+                <strong>For authors</strong>
+                <p class="mb-0">Enter a studio built for publishing, previews, PDF releases, and premium book listings.</p>
+            </div>
+        </div>
+    </div>
+
+    <form id="account" method="post" class="glass-card auth-card">
+        <h2>Sign in to Inkspire</h2>
+        <p class="muted-copy">Use your email and password to continue reading, publishing, and managing your profile.</p>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Input.Email" class="form-label"></label>
+            <input asp-for="Input.Email" class="form-control form-control-lg" autocomplete="username" />
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Input.Password" class="form-label"></label>
+            <input asp-for="Input.Password" class="form-control form-control-lg" autocomplete="current-password" />
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-check mb-4">
+            <input asp-for="Input.RememberMe" class="form-check-input" />
+            <label asp-for="Input.RememberMe" class="form-check-label"></label>
+        </div>
+
+        <button id="login-submit" type="submit" class="btn btn-brand w-100">Login</button>
+
+        <div class="auth-links">
+            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Create an account</a>
+            <a asp-page="./ForgotPassword">Forgot your password?</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,86 @@
+@page
+@model PoetryPlatform.Web.Areas.Identity.Pages.Account.Manage.IndexModel
+@{
+    ViewData["Title"] = "Manage Account";
+    var avatarText = string.IsNullOrWhiteSpace(Model.DisplayName) ? "I" : Model.DisplayName.Substring(0, 1).ToUpperInvariant();
+}
+
+<section class="page-hero page-hero--compact">
+    <div>
+        <span class="eyebrow">Profile</span>
+        <h1>Hi, @Model.DisplayName.</h1>
+        <p class="lead-copy">Update your public name, account details, and the photo readers will connect with your writing.</p>
+    </div>
+</section>
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+<div class="two-column-section">
+    <div class="section-panel">
+        <div class="stats-grid stats-grid--three">
+            <article class="stat-card">
+                <strong>@Model.WritingCount</strong>
+                <span>Writings</span>
+            </article>
+            <article class="stat-card">
+                <strong>@Model.TotalViews</strong>
+                <span>Total reads</span>
+            </article>
+            <article class="stat-card">
+                <strong>@Model.TotalLikes</strong>
+                <span>Total likes</span>
+            </article>
+        </div>
+        <div class="glass-card sidebar-panel">
+            <span class="eyebrow">Security and status</span>
+            <p><strong>2-step authentication:</strong> @(Model.TwoFactorEnabled ? "Enabled" : "Available but currently off")</p>
+            <p><strong>Joined:</strong> @Model.JoinedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
+            <p class="mb-0"><strong>Comments received:</strong> @Model.TotalComments</p>
+        </div>
+    </div>
+
+    <div class="section-panel">
+        <form method="post" enctype="multipart/form-data" class="glass-card editor-form compact-form">
+            @Html.AntiForgeryToken()
+
+            <div class="profile-identity-card mb-4">
+                @if (!string.IsNullOrWhiteSpace(Model.ProfileImagePath))
+                {
+                    <img src="@Model.ProfileImagePath" alt="@Model.DisplayName" class="profile-photo profile-photo--large" />
+                }
+                else
+                {
+                    <div class="profile-photo profile-photo--large profile-photo--fallback">@avatarText</div>
+                }
+
+                <div>
+                    <h2 class="mb-2">@Model.DisplayName</h2>
+                    <p class="muted-copy mb-2">This photo appears in your profile area and alongside your writing across Inkspire.</p>
+                    <label class="form-label" for="profileImage">Profile photo</label>
+                    <input id="profileImage" name="profileImage" type="file" class="form-control" accept="image/*" />
+                    @if (ViewData.ModelState.TryGetValue("profileImage", out var profileImageState) && profileImageState.Errors.Count > 0)
+                    {
+                        <span class="text-danger">@profileImageState.Errors[0].ErrorMessage</span>
+                    }
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input class="form-control" value="@Model.Username" disabled />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Author / Pen Name</label>
+                <input name="Input.AuthorName" value="@Model.Input.AuthorName" class="form-control" />
+                <small class="text-muted">This name is shown publicly on your writings.</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Phone number</label>
+                <input name="Input.PhoneNumber" value="@Model.Input.PhoneNumber" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-brand">Save profile</button>
+        </form>
+    </div>
+</div>

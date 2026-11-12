@@ -1,0 +1,87 @@
+@model PoetryPlatform.Web.Models.AdminDashboardVm
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<section class="page-hero page-hero--compact">
+    <div>
+        <span class="eyebrow">Admin control room</span>
+        <h1>Operational visibility for community health and platform commerce.</h1>
+        <p class="lead-copy">See user growth, moderation pressure, content distribution, and the creator activity now feeding Inkspire&apos;s payment and payout layer.</p>
+    </div>
+</section>
+
+<div class="stats-grid">
+    <article class="stat-card"><strong>@Model.TotalUsers</strong><span>Users</span></article>
+    <article class="stat-card"><strong>@Model.PublishedPoems</strong><span>Published works</span></article>
+    <article class="stat-card"><strong>@Model.TotalReads</strong><span>Total reads</span></article>
+    <article class="stat-card"><strong>@Model.TotalLikes</strong><span>Total likes</span></article>
+    <article class="stat-card"><strong>@Model.TotalComments</strong><span>Total comments</span></article>
+    <article class="stat-card"><strong>@Model.FlaggedComments</strong><span>Flagged comments</span></article>
+</div>
+
+<section class="two-column-section">
+    <div class="section-panel">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">Catalog mix</span>
+                <h2>What authors are publishing</h2>
+            </div>
+        </div>
+        <div class="stack-list">
+            <article class="stack-card">
+                <h3>@Model.PdfListings PDF listings</h3>
+                <p class="card-meta">Long-form poems and books with attached files.</p>
+            </article>
+            <article class="stack-card">
+                <h3>@Model.PaidListings platform-paid offerings</h3>
+                <p class="card-meta">Premium listings readers can now move through checkout on-platform.</p>
+            </article>
+            <article class="stack-card">
+                <h3>@Model.ExternalListings external storefront releases</h3>
+                <p class="card-meta">Authors already sending traffic to outside stores.</p>
+            </article>
+        </div>
+    </div>
+
+    <div class="section-panel">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">Revenue policy</span>
+                <h2>Commission and payout direction</h2>
+            </div>
+        </div>
+        <div class="notice-card h-100">
+            <strong>@Model.PlatformCommissionPercent% platform commission</strong>
+            <p>Inkspire now tracks orders, provider choice, receipts, author earnings, and payout readiness so the platform share and author share can be managed from one commerce backbone.</p>
+            <div class="card-footer-row">
+                <a asp-controller="Admin" asp-action="Payouts" class="btn btn-brand">Open payouts</a>
+                <a asp-controller="Admin" asp-action="Users" class="btn btn-brand btn-brand--ghost">Manage users</a>
+                <a asp-controller="Admin" asp-action="FlaggedComments" class="btn btn-brand btn-brand--ghost">Moderate comments</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Leaderboard</span>
+            <h2>Top active authors right now</h2>
+        </div>
+    </div>
+    <div class="stack-list">
+        @foreach (var author in Model.TopAuthors)
+        {
+            <article class="stack-card">
+                <h3>@author.AuthorName</h3>
+                <div class="metric-row">
+                    <span>@author.Poems releases</span>
+                    <span>@author.Views reads</span>
+                    <span>@author.Likes likes</span>
+                    <span>@author.Comments comments</span>
+                </div>
+            </article>
+        }
+    </div>
+</section>

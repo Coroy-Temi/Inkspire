@@ -1,0 +1,59 @@
+@model List<PoetryPlatform.Web.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<section class="page-hero page-hero--compact">
+    <div>
+        <span class="eyebrow">Admin users</span>
+        <h1>Review access and account state.</h1>
+    </div>
+</section>
+
+<div class="table-shell">
+    <table class="table align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Author Name</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th class="text-end">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                var isLocked = user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.UtcNow;
+
+                <tr>
+                    <td>@user.Email</td>
+                    <td>@(string.IsNullOrWhiteSpace(user.AuthorName) ? "Not set" : user.AuthorName)</td>
+                    <td>@(string.IsNullOrWhiteSpace(user.PhoneNumber) ? "Not set" : user.PhoneNumber)</td>
+                    <td>
+                        <span class="badge @(isLocked ? "text-bg-danger" : "text-bg-success")">@(isLocked ? "Locked" : "Active")</span>
+                    </td>
+                    <td class="text-end">
+                        @if (isLocked)
+                        {
+                            <form asp-action="UnlockUser" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@user.Id" />
+                                <button class="btn btn-sm btn-outline-success">Unlock</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="LockUser" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@user.Id" />
+                                <button class="btn btn-sm btn-outline-danger">Lock</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

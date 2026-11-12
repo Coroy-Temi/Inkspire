@@ -1,0 +1,43 @@
+@model IEnumerable<PoetryPlatform.Web.Models.Comment>
+@{
+    ViewData["Title"] = "Flagged Comments";
+}
+
+<section class="page-hero page-hero--compact">
+    <div>
+        <span class="eyebrow">Moderation</span>
+        <h1>Review flagged comments before they shape the community.</h1>
+    </div>
+</section>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">No flagged comments right now.</div>
+}
+else
+{
+    <div class="stack-list">
+        @foreach (var comment in Model)
+        {
+            <article class="stack-card stack-card--large">
+                <div class="stack-card__topline">
+                    <span class="pill-label">@comment.Poem.Title</span>
+                    <span class="muted-mini">@comment.CreatedAt.ToLocalTime().ToString("g")</span>
+                </div>
+                <p class="mb-0">@comment.Content</p>
+                <div class="card-footer-row">
+                    <form asp-action="DeleteComment" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@comment.Id" />
+                        <button class="btn btn-outline-danger">Soft delete</button>
+                    </form>
+                    <form asp-action="RestoreComment" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@comment.Id" />
+                        <button class="btn btn-brand btn-brand--ghost">Restore</button>
+                    </form>
+                </div>
+            </article>
+        }
+    </div>
+}

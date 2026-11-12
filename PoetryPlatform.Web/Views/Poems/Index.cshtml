@@ -1,0 +1,72 @@
+@model IEnumerable<PoetryPlatform.Web.Models.PoemCardVm>
+@inject Microsoft.Extensions.Options.IOptions<PoetryPlatform.Web.Models.Payments.PaymentPlatformOptions> PaymentOptions
+@{
+    ViewData["Title"] = "Library";
+    var displayCurrency = PaymentOptions.Value.DefaultCurrency.ToUpperInvariant();
+}
+
+<section class="page-hero page-hero--compact">
+    <div>
+        <span class="eyebrow">Reader experience</span>
+        <h1>Discover poems, long-form writing, and book-ready releases.</h1>
+        <p class="lead-copy">
+            Browse free pieces, external storefront drops, and platform-paid book previews in one clean library.
+        </p>
+    </div>
+    <div class="search-shell">
+        <label class="form-label" for="library-search">Search titles, authors, or access type</label>
+        <input id="library-search" class="form-control form-control-lg" type="search" placeholder="Search the library..." data-library-search />
+    </div>
+</section>
+
+<section class="discover-grid">
+    @foreach (var poem in Model)
+    {
+        var accessLabel = poem.AccessType switch
+        {
+            ContentAccessType.PlatformPaid => $"Platform Paid - {displayCurrency} {poem.Price:0.##}",
+            ContentAccessType.ExternalLink => "External Storefront",
+            _ => "Free To Read"
+        };
+        var actionLabel = poem.AccessType switch
+        {
+            ContentAccessType.PlatformPaid => "Preview Release",
+            ContentAccessType.ExternalLink => "View Storefront",
+            _ => "Read Now"
+        };
+        var avatarText = string.IsNullOrWhiteSpace(poem.AuthorName) ? "I" : poem.AuthorName.Substring(0, 1).ToUpperInvariant();
+
+        <article class="discover-card" data-library-card data-search="@($"{poem.Title} {poem.AuthorName} {accessLabel}".ToLowerInvariant())">
+            <div class="discover-card__top">
+                <span class="pill-label">@accessLabel</span>
+                <span class="muted-mini">@poem.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span>
+            </div>
+            <h2>@poem.Title</h2>
+            <div class="author-line">
+                @if (!string.IsNullOrWhiteSpace(poem.AuthorProfileImagePath))
+                {
+                    <img src="@poem.AuthorProfileImagePath" alt="@poem.AuthorName" class="author-avatar" />
+                }
+                else
+                {
+                    <span class="author-avatar author-avatar--fallback">@avatarText</span>
+                }
+                <p class="card-meta">by @poem.AuthorName</p>
+            </div>
+            <div class="metric-row">
+                <span>@poem.Views reads</span>
+                <span>@poem.Likes likes</span>
+                <span>@poem.Comments comments</span>
+            </div>
+            <div class="card-footer-row">
+                @if (poem.HasPdf)
+                {
+                    <span class="badge-soft">PDF attached</span>
+                }
+                <a class="btn btn-brand btn-brand--ghost" asp-action="Read" asp-route-id="@poem.Id">@actionLabel</a>
+            </div>
+        </article>
+    }
+</section>
+
+<p class="empty-state d-none" data-library-empty>No writings matched that search.</p>

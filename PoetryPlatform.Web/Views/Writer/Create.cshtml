@@ -1,0 +1,123 @@
+@model PoetryPlatform.Web.Models.Poem
+
+@{
+    ViewData["Title"] = "Create Writing";
+}
+
+<section class="studio-shell">
+    <div class="studio-showcase">
+        <div class="studio-hero studio-hero--editor">
+            <div>
+                <span class="eyebrow">Author studio</span>
+                <h1>Create a poem, essay, or book-ready listing.</h1>
+                <p class="lead-copy">Shape the work, preview the rhythm of the page, and present every release with a more immersive editorial feel.</p>
+            </div>
+            <div class="studio-hero__badges">
+                <span class="badge-soft">Live preview</span>
+                <span class="badge-soft">Book-style reading</span>
+                <span class="badge-soft">PDF-ready publishing</span>
+            </div>
+        </div>
+        <aside class="studio-showcase__rail">
+            <article class="glass-card studio-insight-card">
+                <span class="eyebrow">Paystack live</span>
+                <h2>Sell to the audience you&apos;re launching to now.</h2>
+                <p class="card-meta">Paid releases are tuned for Paystack-first checkout, while your preview text and uploaded PDF stay clearly separated for readers.</p>
+            </article>
+            <article class="glass-card studio-insight-card">
+                <span class="eyebrow">Page control</span>
+                <h2>Write in scenes, not blocks.</h2>
+                <p class="card-meta">Page breaks, font previews, and the reading layout now help you shape a more book-like experience before you publish.</p>
+            </article>
+        </aside>
+    </div>
+
+    <div class="editor-layout">
+        <form asp-action="Create" method="post" enctype="multipart/form-data" class="glass-card editor-form">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label">Title</label>
+                <input asp-for="Title" class="form-control form-control-lg" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Content" class="form-label">Writing or preview text</label>
+                <div class="editor-toolbar">
+                    <button type="button" class="pill-button" data-insert-page-break>Add page break</button>
+                    <span class="muted-mini">Each page break starts a new reading page for readers.</span>
+                </div>
+                <textarea asp-for="Content" class="form-control editor-textarea" rows="14" placeholder="Write the poem, excerpt, or teaser your readers should see first." data-writing-input></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AccessType" class="form-label">Access type</label>
+                <select asp-for="AccessType" asp-items="Html.GetEnumSelectList<ContentAccessType>()" class="form-select" data-access-type></select>
+            </div>
+
+            <div class="mb-3" data-access-panel="1">
+                <label asp-for="Price" class="form-label">Price</label>
+                <input asp-for="Price" class="form-control" type="number" min="0" step="0.01" placeholder="50.00" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+                <small class="text-muted">Paid releases on Inkspire need a preview here and the full PDF upload below.</small>
+            </div>
+
+            <div class="mb-3" data-access-panel="2">
+                <label asp-for="ExternalPurchaseUrl" class="form-label">External purchase URL</label>
+                <input asp-for="ExternalPurchaseUrl" class="form-control" placeholder="https://gumroad.com/your-book" />
+                <span asp-validation-for="ExternalPurchaseUrl" class="text-danger"></span>
+                <small class="text-muted">Use this if you are already selling on Amazon, Gumroad, Paystack, Flutterwave, or another storefront.</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Upload PDF</label>
+                <input type="file" name="pdfFile" class="form-control" accept="application/pdf" />
+                <small class="text-muted">Platform-paid releases must include the full PDF. Free releases can use this as an attached edition.</small>
+            </div>
+
+            <button type="submit" class="btn btn-brand">Publish writing</button>
+        </form>
+
+        <aside class="studio-sidebar">
+            <div class="glass-card guidance-panel">
+                <span class="eyebrow">Position the release</span>
+                <h2>Three publishing modes</h2>
+                <ul class="guidance-list">
+                    <li><strong>Free:</strong> full poem or PDF is readable on Inkspire.</li>
+                    <li><strong>Platform Paid:</strong> add preview text here and upload the full PDF readers buy.</li>
+                    <li><strong>External Link:</strong> market the work here and send readers to your existing store.</li>
+                </ul>
+                <div class="notice-card">
+                    <strong>Paid-release rule</strong>
+                    <p class="mb-0">If you choose platform paid, the preview text is what readers see before checkout, and the uploaded PDF is what becomes the purchased edition.</p>
+                </div>
+                <div class="notice-card mt-3">
+                    <strong>Checkout routing</strong>
+                    <p class="mb-0">Inkspire is currently routing paid releases through Paystack, so your paid preview and PDF flow can be tested cleanly for African readers first.</p>
+                </div>
+            </div>
+
+            <div class="glass-card preview-panel">
+                <div class="section-heading">
+                    <div>
+                        <span class="eyebrow">Reading preview</span>
+                        <h2>See how the page breathes</h2>
+                    </div>
+                </div>
+                <div class="preview-controls">
+                    <button type="button" class="pill-button active" data-preview-font="classic">Classic</button>
+                    <button type="button" class="pill-button" data-preview-font="book">Book</button>
+                    <button type="button" class="pill-button" data-preview-font="modern">Modern</button>
+                </div>
+                <div class="writing-preview-pages" data-writing-preview></div>
+            </div>
+        </aside>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

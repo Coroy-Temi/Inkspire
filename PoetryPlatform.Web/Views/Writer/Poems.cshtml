@@ -1,0 +1,122 @@
+@model IEnumerable<PoetryPlatform.Web.Models.WriterPoemVm>
+
+@{
+    ViewData["Title"] = "My Writings";
+}
+
+<section class="page-hero page-hero--compact">
+    <div class="studio-showcase studio-showcase--board">
+        <div class="studio-hero studio-hero--dashboard">
+            <div>
+                <span class="eyebrow">Author studio</span>
+                <h1>Your writings, audience signals, and next moves.</h1>
+                <p class="lead-copy">Track how readers respond to your work, shape stronger release pages, and run a more polished publishing workflow from one focused studio.</p>
+            </div>
+            <div class="hero-actions">
+                <button type="button" class="btn btn-brand btn-brand--ghost btn-lg" data-studio-guide-open>Studio guide</button>
+                <a asp-action="Payouts" class="btn btn-brand btn-brand--ghost btn-lg">Payouts</a>
+                <a asp-action="Create" class="btn btn-brand btn-lg">New Writing</a>
+            </div>
+        </div>
+        <aside class="studio-showcase__rail">
+            <article class="glass-card studio-insight-card">
+                <span class="eyebrow">Publishing pulse</span>
+                <h2>@Model.Count() live pieces</h2>
+                <div class="metric-row">
+                    <span>@Model.Sum(p => p.Views) reads</span>
+                    <span>@Model.Sum(p => p.Comments) comments</span>
+                </div>
+                <p class="card-meta">Use studio editing, page breaks, and preview modes to make every release feel more intentional.</p>
+            </article>
+            <article class="glass-card studio-insight-card">
+                <span class="eyebrow">Commerce focus</span>
+                <h2>Paystack-first selling</h2>
+                <p class="card-meta">Paid releases now center on Paystack so your reader checkout flow is aligned with the audience you are launching to first.</p>
+            </article>
+        </aside>
+    </div>
+</section>
+
+<div class="stats-grid stats-grid--three">
+    <article class="stat-card">
+        <strong>@Model.Count()</strong>
+        <span>Published items</span>
+    </article>
+    <article class="stat-card">
+        <strong>@Model.Sum(p => p.Views)</strong>
+        <span>Total reads</span>
+    </article>
+    <article class="stat-card">
+        <strong>@Model.Sum(p => p.Comments)</strong>
+        <span>Total comments</span>
+    </article>
+</div>
+
+<div class="stack-list">
+    @foreach (var poem in Model)
+    {
+        <article class="stack-card stack-card--large">
+            <div class="stack-card__topline">
+                <span class="pill-label">@poem.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span>
+            </div>
+            <h2>@poem.Title</h2>
+            <div class="metric-row">
+                <span>@poem.Views reads</span>
+                <span>@poem.Likes likes</span>
+                <span>@poem.Comments comments</span>
+            </div>
+            <div class="card-footer-row">
+                <a asp-action="Edit" asp-route-id="@poem.Id" class="btn btn-brand btn-brand--ghost">Edit</a>
+                <form asp-action="Delete" asp-route-id="@poem.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Delete this writing?');">Delete</button>
+                </form>
+            </div>
+        </article>
+    }
+</div>
+
+<div class="modal fade" id="authorStudioGuide" tabindex="-1" aria-labelledby="authorStudioGuideLabel" aria-hidden="true" data-studio-guide-modal>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content glass-modal">
+            <div class="modal-header border-0">
+                <div>
+                    <span class="eyebrow">Author studio guide</span>
+                    <h2 class="mb-0" id="authorStudioGuideLabel">How publishing and marketing work on Inkspire</h2>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="guidance-grid">
+                    <article class="notice-card">
+                        <strong>Free release</strong>
+                        <p class="mb-0">Publish the full writing directly on Inkspire. Add a PDF if you want readers to open an attached edition.</p>
+                    </article>
+                    <article class="notice-card">
+                        <strong>Platform-paid release</strong>
+                        <p class="mb-0">Write the preview readers should see first, then upload the full PDF of the book. The preview markets the work; the PDF is what unlocks after payment.</p>
+                    </article>
+                    <article class="notice-card">
+                        <strong>External storefront</strong>
+                        <p class="mb-0">Use Inkspire as the discovery page, then send readers to your existing store with an external purchase link.</p>
+                    </article>
+                    <article class="notice-card">
+                        <strong>Page breaks and presentation</strong>
+                        <p class="mb-0">Use page breaks to control how readers move through the piece. Your line spacing and pacing are preserved page by page.</p>
+                    </article>
+                    <article class="notice-card">
+                        <strong>Payments and payouts</strong>
+                        <p class="mb-0">Reader checkout is now centered on Paystack for Inkspire&apos;s active audience, while the older Stripe path stays parked in the codebase for later expansion.</p>
+                    </article>
+                    <article class="notice-card">
+                        <strong>Future subscriptions</strong>
+                        <p class="mb-0">Reader subscriptions are already modeled in the commerce layer so Inkspire can open membership access later without rebuilding your catalog setup.</p>
+                    </article>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-brand" data-bs-dismiss="modal">Start writing</button>
+            </div>
+        </div>
+    </div>
+</div>

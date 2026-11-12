@@ -1,0 +1,149 @@
+@model PoetryPlatform.Web.Models.Payments.CheckoutStatusVm
+@using PoetryPlatform.Web.Models.Payments
+
+@{
+    ViewData["Title"] = "Purchase status";
+    var statusLabel = Model.Order.Status switch
+    {
+        OrderStatus.Paid => "Purchase confirmed",
+        OrderStatus.CheckoutCreated => "Processing payment",
+        OrderStatus.Pending => "Finalizing checkout",
+        OrderStatus.Failed => "Payment failed",
+        OrderStatus.Cancelled => "Checkout cancelled",
+        _ => "Purchase update"
+    };
+    var accentClass = Model.Order.Status switch
+    {
+        OrderStatus.Paid => "commerce-shell--success",
+        OrderStatus.Failed => "commerce-shell--danger",
+        OrderStatus.Cancelled => "commerce-shell--muted",
+        _ => "commerce-shell--pending"
+    };
+}
+
+<section class="commerce-shell @accentClass">
+    <div class="commerce-hero">
+        <div class="commerce-hero__copy">
+            <span class="eyebrow">Checkout status</span>
+            <h1>@statusLabel</h1>
+            <p class="lead-copy">Receipt-ready details for <strong>@Model.Order.Poem.Title</strong>.</p>
+            <div class="hero-actions">
+                <a class="btn btn-brand" asp-action="Receipt" asp-route-orderId="@Model.Order.Id">Open receipt</a>
+                <a class="btn btn-brand btn-brand--ghost" asp-action="History">Purchase history</a>
+            </div>
+        </div>
+
+        <div class="commerce-hero__summary">
+            <article class="commerce-stat">
+                <span>Order</span>
+                <strong>@Model.Order.OrderNumber</strong>
+            </article>
+            <article class="commerce-stat">
+                <span>Total paid</span>
+                <strong>@Model.Order.Currency.ToUpperInvariant() @Model.Order.GrossAmount.ToString("0.##")</strong>
+            </article>
+            <article class="commerce-stat">
+                <span>Status</span>
+                <strong>@statusLabel</strong>
+            </article>
+        </div>
+    </div>
+
+    <div class="commerce-grid">
+        <div class="commerce-panel commerce-panel--receipt">
+            <div class="receipt-sheet">
+                <div class="receipt-sheet__topline">
+                    <div>
+                        <span class="eyebrow">Digital receipt</span>
+                        <h2>@Model.Order.Poem.Title</h2>
+                    </div>
+                    <span class="pill-label">@statusLabel</span>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+                {
+                    <div class="notice-card">
+                        <strong>Status update</strong>
+                        <p class="mb-0">@Model.StatusMessage</p>
+                    </div>
+                }
+
+                <dl class="receipt-grid">
+                    <div>
+                        <dt>Order number</dt>
+                        <dd>@Model.Order.OrderNumber</dd>
+                    </div>
+                    <div>
+                        <dt>Purchased on</dt>
+                        <dd>@Model.Order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, h:mm tt")</dd>
+                    </div>
+                    <div>
+                        <dt>Payment provider</dt>
+                        <dd>@Model.Order.Provider</dd>
+                    </div>
+                    <div>
+                        <dt>Currency</dt>
+                        <dd>@Model.Order.Currency.ToUpperInvariant()</dd>
+                    </div>
+                </dl>
+
+                <div class="receipt-total">
+                    <span>Total</span>
+                    <strong>@Model.Order.Currency.ToUpperInvariant() @Model.Order.GrossAmount.ToString("0.##")</strong>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Order.FailureReason))
+                {
+                    <div class="notice-card">
+                        <strong>Payment note</strong>
+                        <p class="mb-0">@Model.Order.FailureReason</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="commerce-panel">
+            <div class="timeline-card">
+                <span class="eyebrow">Access status</span>
+                @if (Model.CanAccessNow)
+                {
+                    <h2>Your access is ready.</h2>
+                    <p>You can return to the reading page now and open the attached edition immediately.</p>
+                }
+                else if (Model.Order.Status == OrderStatus.CheckoutCreated || Model.Order.Status == OrderStatus.Pending)
+                {
+                    <h2>Your payment is still being checked.</h2>
+                    <p>Inkspire is holding the receipt open while @Model.Order.Provider finishes confirming the payment.</p>
+                }
+                else
+                {
+                    <h2>The purchase is not complete yet.</h2>
+                    <p>You can return to the title and try the checkout again whenever you are ready.</p>
+                }
+
+                <div class="timeline-steps">
+                    <div class="timeline-step @(Model.Order.Status != OrderStatus.Failed && Model.Order.Status != OrderStatus.Cancelled ? "active" : null)">
+                        <strong>1</strong>
+                        <span>Order created</span>
+                    </div>
+                    <div class="timeline-step @(Model.Order.Status == OrderStatus.CheckoutCreated || Model.Order.Status == OrderStatus.Pending || Model.Order.Status == OrderStatus.Paid ? "active" : null)">
+                        <strong>2</strong>
+                        <span>Checkout returned</span>
+                    </div>
+                    <div class="timeline-step @(Model.Order.Status == OrderStatus.Paid ? "active" : null)">
+                        <strong>3</strong>
+                        <span>Access unlocked</span>
+                    </div>
+                </div>
+
+                <div class="hero-actions">
+                    <a class="btn btn-brand" asp-controller="Poems" asp-action="Read" asp-route-id="@Model.Order.PoemId">Return to title</a>
+                    @if (!string.IsNullOrWhiteSpace(Model.Order.CheckoutUrl) && !Model.CanAccessNow)
+                    {
+                        <a class="btn btn-brand btn-brand--ghost" href="@Model.Order.CheckoutUrl">Resume checkout</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,86 @@
+@model PoetryPlatform.Web.Models.Payments.PurchaseReceiptVm
+@using PoetryPlatform.Web.Models.Payments
+
+@{
+    ViewData["Title"] = "Receipt";
+    var statusLabel = Model.Order.Status switch
+    {
+        OrderStatus.Paid => "Paid",
+        OrderStatus.CheckoutCreated => "Processing",
+        OrderStatus.Pending => "Pending",
+        OrderStatus.Failed => "Failed",
+        OrderStatus.Cancelled => "Cancelled",
+        _ => "Open"
+    };
+    var latestPayment = Model.Order.PaymentRecords.OrderByDescending(p => p.CreatedAt).FirstOrDefault();
+}
+
+<section class="commerce-shell commerce-shell--receipt-page">
+    <div class="receipt-sheet receipt-sheet--full">
+        <div class="receipt-sheet__topline">
+            <div>
+                <span class="eyebrow">Inkspire receipt</span>
+                <h1>@Model.Order.Poem.Title</h1>
+                <p class="muted-copy mb-0">A saved record of this purchase for your history.</p>
+            </div>
+            <div class="receipt-badge-stack">
+                <span class="pill-label">@statusLabel</span>
+                <span class="badge-soft">@Model.Order.Provider</span>
+            </div>
+        </div>
+
+        <div class="receipt-grid">
+            <div>
+                <dt>Receipt number</dt>
+                <dd>@Model.Order.OrderNumber</dd>
+            </div>
+            <div>
+                <dt>Buyer</dt>
+                <dd>@Model.BuyerName</dd>
+            </div>
+            <div>
+                <dt>Author</dt>
+                <dd>@Model.AuthorName</dd>
+            </div>
+            <div>
+                <dt>Created</dt>
+                <dd>@Model.Order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, h:mm tt")</dd>
+            </div>
+            <div>
+                <dt>Completed</dt>
+                <dd>@(Model.Order.CompletedAt?.ToLocalTime().ToString("dd MMM yyyy, h:mm tt") ?? "Not completed yet")</dd>
+            </div>
+            <div>
+                <dt>Currency</dt>
+                <dd>@Model.Order.Currency.ToUpperInvariant()</dd>
+            </div>
+        </div>
+
+        <div class="receipt-total">
+            <span>Amount paid</span>
+            <strong>@Model.Order.Currency.ToUpperInvariant() @Model.Order.GrossAmount.ToString("0.##")</strong>
+        </div>
+
+        <div class="receipt-grid receipt-grid--compact">
+            <div>
+                <dt>Payment reference</dt>
+                <dd>@(latestPayment?.ExternalReference ?? Model.Order.ExternalCheckoutSessionId ?? "Pending")</dd>
+                <dt class="mt-3">Payment status</dt>
+                <dd>@(latestPayment?.Status.ToString() ?? Model.Order.Status.ToString())</dd>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Order.FailureReason))
+        {
+            <div class="notice-card">
+                <strong>Payment note</strong>
+                <p class="mb-0">@Model.Order.FailureReason</p>
+            </div>
+        }
+
+        <div class="hero-actions">
+            <a class="btn btn-brand" asp-action="History">Purchase history</a>
+            <a class="btn btn-brand btn-brand--ghost" asp-controller="Poems" asp-action="Read" asp-route-id="@Model.Order.PoemId">Return to title</a>
+        </div>
+    </div>
+</section>

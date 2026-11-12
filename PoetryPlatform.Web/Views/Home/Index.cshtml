@@ -1,0 +1,210 @@
+@model PoetryPlatform.Web.Models.HomeIndexVm
+@inject Microsoft.Extensions.Options.IOptions<PoetryPlatform.Web.Models.Payments.PaymentPlatformOptions> PaymentOptions
+@{
+    ViewData["Title"] = "Home";
+    var displayCurrency = PaymentOptions.Value.DefaultCurrency.ToUpperInvariant();
+}
+
+<section class="hero-panel">
+    <div class="hero-copy">
+        <span class="eyebrow">Built for readers, writers, and modern publishing</span>
+        <h1 class="display-title">Inkspire gives writing a polished home, a real audience, and room to grow into books.</h1>
+        <p class="lead-copy">
+            Discover new voices, spark conversations around poems, publish polished writing, and grow into book sales with a storefront that already understands PDFs, reader attention, and author identity.
+        </p>
+        <div class="hero-actions">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a class="btn btn-brand btn-lg" asp-controller="Poems" asp-action="Index">Explore The Library</a>
+                <a class="btn btn-brand btn-brand--ghost btn-lg" asp-controller="Writer" asp-action="Poems">Open Author Studio</a>
+            }
+            else
+            {
+                <a class="btn btn-brand btn-lg" asp-area="Identity" asp-page="/Account/Register">Create An Account</a>
+                <a class="btn btn-brand btn-brand--ghost btn-lg" asp-area="Identity" asp-page="/Account/Login">Sign In</a>
+            }
+        </div>
+        <div class="hero-note">
+            <span>Publish original writing, build readership, and present books with confidence.</span>
+            <span>Designed for authors growing an audience and readers discovering new voices.</span>
+        </div>
+    </div>
+
+    <div class="hero-stack">
+        <div class="glass-card spotlight-card">
+            <div class="spotlight-card__header">
+                <span class="eyebrow">Inkspire snapshot</span>
+                <span class="badge-soft">Live community</span>
+            </div>
+            <div class="stats-grid">
+                <article class="stat-card">
+                    <strong>@Model.PublishedPoems</strong>
+                    <span>Published works</span>
+                </article>
+                <article class="stat-card">
+                    <strong>@Model.ActiveAuthors</strong>
+                    <span>Active authors</span>
+                </article>
+                <article class="stat-card">
+                    <strong>@Model.TotalReads</strong>
+                    <span>Total reads</span>
+                </article>
+                <article class="stat-card">
+                    <strong>@Model.BookListings</strong>
+                    <span>PDF book listings</span>
+                </article>
+            </div>
+        </div>
+
+        <div class="glass-card roadmap-card">
+            <span class="eyebrow">Commerce direction</span>
+            <h2>Sell books, share excerpts, and turn discovery into lasting readership.</h2>
+            <p>
+                Position a work as free reading, a premium Inkspire release, or an external storefront offer, while giving readers a polished place to discover the writing first.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Fresh arrivals</span>
+            <h2>New work entering Inkspire</h2>
+        </div>
+        <a class="section-link" asp-controller="Poems" asp-action="Index">View all</a>
+    </div>
+
+    <div class="discover-grid">
+        @foreach (var poem in Model.LatestReleases)
+        {
+            var accessLabel = poem.AccessType switch
+            {
+                ContentAccessType.PlatformPaid => $"Platform Paid - {displayCurrency} {poem.Price:0.##}",
+                ContentAccessType.ExternalLink => "External Storefront",
+                _ => "Free To Read"
+            };
+            var actionLabel = poem.AccessType switch
+            {
+                ContentAccessType.PlatformPaid => "Preview Release",
+                ContentAccessType.ExternalLink => "View Details",
+                _ => "Read Now"
+            };
+            var avatarText = string.IsNullOrWhiteSpace(poem.AuthorName) ? "I" : poem.AuthorName.Substring(0, 1).ToUpperInvariant();
+
+            <article class="discover-card" data-library-card data-search="@($"{poem.Title} {poem.AuthorName} {accessLabel}".ToLowerInvariant())">
+                <div class="discover-card__top">
+                    <span class="pill-label">@accessLabel</span>
+                    <span class="muted-mini">@poem.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span>
+                </div>
+                <h3>@poem.Title</h3>
+                <div class="author-line">
+                    @if (!string.IsNullOrWhiteSpace(poem.AuthorProfileImagePath))
+                    {
+                        <img src="@poem.AuthorProfileImagePath" alt="@poem.AuthorName" class="author-avatar" />
+                    }
+                    else
+                    {
+                        <span class="author-avatar author-avatar--fallback">@avatarText</span>
+                    }
+                    <p class="card-meta">by @poem.AuthorName</p>
+                </div>
+                <div class="metric-row">
+                    <span>@poem.Views reads</span>
+                    <span>@poem.Likes likes</span>
+                    <span>@poem.Comments comments</span>
+                </div>
+                <div class="card-footer-row">
+                    @if (poem.HasPdf)
+                    {
+                        <span class="badge-soft">PDF included</span>
+                    }
+                    <a class="btn btn-brand btn-brand--ghost" asp-controller="Poems" asp-action="Read" asp-route-id="@poem.Id">@actionLabel</a>
+                </div>
+            </article>
+        }
+    </div>
+</section>
+
+<section class="home-highlights">
+    <div class="section-panel">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">Momentum</span>
+                <h2>Trending on Inkspire</h2>
+            </div>
+            <a class="section-link" asp-controller="Poems" asp-action="Trending">See trending</a>
+        </div>
+
+        <div class="stack-list stack-list--featured">
+            @foreach (var poem in Model.TrendingNow)
+            {
+                var avatarText = string.IsNullOrWhiteSpace(poem.AuthorName) ? "I" : poem.AuthorName.Substring(0, 1).ToUpperInvariant();
+                <article class="stack-card stack-card--featured">
+                    <div>
+                        <h3>@poem.Title</h3>
+                        <div class="author-line">
+                            @if (!string.IsNullOrWhiteSpace(poem.AuthorProfileImagePath))
+                            {
+                                <img src="@poem.AuthorProfileImagePath" alt="@poem.AuthorName" class="author-avatar" />
+                            }
+                            else
+                            {
+                                <span class="author-avatar author-avatar--fallback">@avatarText</span>
+                            }
+                            <p class="card-meta">by @poem.AuthorName</p>
+                        </div>
+                    </div>
+                    <div class="metric-row metric-row--compact">
+                        <span>@poem.UniqueReaders reads</span>
+                        <span>@poem.Likes likes</span>
+                        <span>@poem.Comments comments</span>
+                        <span class="badge-soft">Score @poem.Score</span>
+                    </div>
+                    <a class="link-cta" asp-controller="Poems" asp-action="Read" asp-route-id="@poem.Id">Open poem</a>
+                </article>
+            }
+        </div>
+    </div>
+
+    <div class="section-panel">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">Community</span>
+                <h2>Most discussed pieces</h2>
+            </div>
+            <a class="section-link" asp-controller="Poems" asp-action="MostCommented">View ranking</a>
+        </div>
+
+        <div class="conversation-board">
+            @foreach (var poem in Model.ConversationStarters)
+            {
+                var avatarText = string.IsNullOrWhiteSpace(poem.AuthorName) ? "I" : poem.AuthorName.Substring(0, 1).ToUpperInvariant();
+                <article class="conversation-card">
+                    <div class="conversation-card__rank">#@poem.Rank</div>
+                    <div class="conversation-card__body">
+                        <div>
+                            <h3>@poem.Title</h3>
+                            <div class="author-line">
+                                @if (!string.IsNullOrWhiteSpace(poem.AuthorProfileImagePath))
+                                {
+                                    <img src="@poem.AuthorProfileImagePath" alt="@poem.AuthorName" class="author-avatar" />
+                                }
+                                else
+                                {
+                                    <span class="author-avatar author-avatar--fallback">@avatarText</span>
+                                }
+                                <p class="card-meta">by @poem.AuthorName</p>
+                            </div>
+                        </div>
+                        <div class="metric-row metric-row--compact">
+                            <span>@poem.CommentCount comments</span>
+                            <span>@poem.CreatedAt.ToLocalTime().ToString("dd MMM")</span>
+                        </div>
+                        <a class="link-cta" asp-controller="Poems" asp-action="Read" asp-route-id="@poem.Id">Join discussion</a>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>

@@ -1,0 +1,8 @@
+@model string
+
+@if (!string.IsNullOrWhiteSpace(Model))
+{
+    <div class="alert alert-success border-0 shadow-sm mb-4" role="alert">
+        @Model
+    </div>
+}

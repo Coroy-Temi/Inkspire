@@ -1,0 +1,43 @@
+@model List<PoetryPlatform.Web.Models.TrendingPoemVm>
+@{
+    ViewData["Title"] = "Trending";
+}
+
+<section class="page-hero page-hero--compact">
+    <div>
+        <span class="eyebrow">Momentum</span>
+        <h1>Trending across readers, likes, and discussion.</h1>
+        <p class="lead-copy">This ranking uses reads, likes, and comments together so the feed reflects real attention, not just recency.</p>
+    </div>
+</section>
+
+<div class="stack-list">
+    @foreach (var poem in Model)
+    {
+        var avatarText = string.IsNullOrWhiteSpace(poem.AuthorName) ? "I" : poem.AuthorName.Substring(0, 1).ToUpperInvariant();
+        <article class="stack-card stack-card--large">
+            <div class="stack-card__topline">
+                <span class="pill-label">Score @poem.Score</span>
+                <span class="muted-mini">@poem.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span>
+            </div>
+            <h2>@poem.Title</h2>
+            <div class="author-line">
+                @if (!string.IsNullOrWhiteSpace(poem.AuthorProfileImagePath))
+                {
+                    <img src="@poem.AuthorProfileImagePath" alt="@poem.AuthorName" class="author-avatar" />
+                }
+                else
+                {
+                    <span class="author-avatar author-avatar--fallback">@avatarText</span>
+                }
+                <p class="card-meta">by @poem.AuthorName</p>
+            </div>
+            <div class="metric-row">
+                <span>@poem.UniqueReaders reads</span>
+                <span>@poem.Likes likes</span>
+                <span>@poem.Comments comments</span>
+            </div>
+            <a asp-action="Read" asp-route-id="@poem.Id" class="link-cta">Read poem</a>
+        </article>
+    }
+</div>

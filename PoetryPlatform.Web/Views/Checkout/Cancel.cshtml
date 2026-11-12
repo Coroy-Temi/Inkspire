@@ -1,0 +1,96 @@
+@model PoetryPlatform.Web.Models.Payments.CheckoutStatusVm
+@using PoetryPlatform.Web.Models.Payments
+
+@{
+    ViewData["Title"] = "Checkout cancelled";
+}
+
+<section class="commerce-shell commerce-shell--muted">
+    <div class="commerce-hero">
+        <div class="commerce-hero__copy">
+            <span class="eyebrow">Checkout status</span>
+            <h1>Checkout cancelled</h1>
+            <p class="lead-copy">Your order is still preserved, so you can come back to it any time.</p>
+            <div class="hero-actions">
+                <a class="btn btn-brand" asp-action="Receipt" asp-route-orderId="@Model.Order.Id">Open receipt</a>
+                <a class="btn btn-brand btn-brand--ghost" asp-action="History">Purchase history</a>
+            </div>
+        </div>
+
+        <div class="commerce-hero__summary">
+            <article class="commerce-stat">
+                <span>Order</span>
+                <strong>@Model.Order.OrderNumber</strong>
+            </article>
+            <article class="commerce-stat">
+                <span>Listing</span>
+                <strong>@Model.Order.Poem.Title</strong>
+            </article>
+            <article class="commerce-stat">
+                <span>Total</span>
+                <strong>@Model.Order.Currency.ToUpperInvariant() @Model.Order.GrossAmount.ToString("0.##")</strong>
+            </article>
+        </div>
+    </div>
+
+    <div class="commerce-grid">
+        <div class="commerce-panel commerce-panel--receipt">
+            <div class="receipt-sheet">
+                <div class="receipt-sheet__topline">
+                    <div>
+                        <span class="eyebrow">Saved order</span>
+                        <h2>@Model.Order.Poem.Title</h2>
+                    </div>
+                    <span class="pill-label">Cancelled</span>
+                </div>
+
+                <dl class="receipt-grid">
+                    <div>
+                        <dt>Order number</dt>
+                        <dd>@Model.Order.OrderNumber</dd>
+                    </div>
+                    <div>
+                        <dt>Created</dt>
+                        <dd>@Model.Order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, h:mm tt")</dd>
+                    </div>
+                    <div>
+                        <dt>Status</dt>
+                        <dd>@Model.Order.Status</dd>
+                    </div>
+                    <div>
+                        <dt>Currency</dt>
+                        <dd>@Model.Order.Currency.ToUpperInvariant()</dd>
+                    </div>
+                </dl>
+
+                <div class="receipt-total">
+                    <span>Order total</span>
+                    <strong>@Model.Order.Currency.ToUpperInvariant() @Model.Order.GrossAmount.ToString("0.##")</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="commerce-panel">
+            <div class="timeline-card">
+                @if (Model.Order.Status == OrderStatus.Paid)
+                {
+                    <h2>This order was later confirmed.</h2>
+                    <p>Even though the checkout page was closed before, the payment eventually completed and the title is now unlocked.</p>
+                }
+                else
+                {
+                    <h2>This checkout was left open-ended.</h2>
+                    <p>No problem. Your order history keeps the record, and you can restart the purchase from the title whenever you are ready.</p>
+                }
+
+                <div class="hero-actions">
+                    <a class="btn btn-brand" asp-controller="Poems" asp-action="Read" asp-route-id="@Model.Order.PoemId">Return to title</a>
+                    @if (!string.IsNullOrWhiteSpace(Model.Order.CheckoutUrl) && Model.Order.Status != OrderStatus.Paid)
+                    {
+                        <a class="btn btn-brand btn-brand--ghost" href="@Model.Order.CheckoutUrl">Resume checkout</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
