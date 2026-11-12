@@ -1,43 +1,124 @@
-﻿@model PoetryPlatform.Web.Models.Poem
+@model PoetryPlatform.Web.Models.Poem
 
 @{
     ViewData["Title"] = "Edit Writing";
 }
 
-<h2>Edit Writing</h2>
-
-<form asp-action="Edit" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" asp-for="Id" />
-
-    <div class="mb-3">
-        <label>Title</label>
-        <input asp-for="Title" class="form-control" />
+<section class="studio-shell">
+    <div class="studio-showcase">
+        <div class="studio-hero studio-hero--editor">
+            <div>
+                <span class="eyebrow">Author studio</span>
+                <h1>Refine the reader and sales experience for this writing.</h1>
+                <p class="lead-copy">Edit the text, adjust the release type, and preview the page with a more spacious editorial layout.</p>
+            </div>
+            <div class="studio-hero__badges">
+                <span class="badge-soft">Live preview</span>
+                <span class="badge-soft">Reader-first layout</span>
+                <span class="badge-soft">Book-style display</span>
+            </div>
+        </div>
+        <aside class="studio-showcase__rail">
+            <article class="glass-card studio-insight-card">
+                <span class="eyebrow">Release polish</span>
+                <h2>Sharpen the storefront and the reading feel together.</h2>
+                <p class="card-meta">Fine-tune the preview, the monetization path, and the page rhythm at the same time so the piece feels cohesive to readers.</p>
+            </article>
+            <article class="glass-card studio-insight-card">
+                <span class="eyebrow">Paystack focus</span>
+                <h2>Keep testing where your readers already are.</h2>
+                <p class="card-meta">The active commerce path now leans into Paystack so your paid experience can be tested cleanly before any wider expansion.</p>
+            </article>
+        </aside>
     </div>
 
-    <div class="mb-3">
-        <label>Content</label>
-        <textarea asp-for="Content" class="form-control" rows="8"></textarea>
-    </div>
+    <div class="editor-layout">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data" class="glass-card editor-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-    <div class="mb-3">
-        <label>Access Type</label>
-        <select asp-for="AccessType" class="form-control">
-            <option value="Free">Free</option>
-            <option value="Paid">Paid</option>
-            <option value="External">External</option>
-        </select>
-    </div>
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label">Title</label>
+                <input asp-for="Title" class="form-control form-control-lg" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
 
-    <div class="mb-3">
-        <label>Price</label>
-        <input asp-for="Price" class="form-control" />
-    </div>
+            <div class="mb-3">
+                <label asp-for="Content" class="form-label">Writing or preview text</label>
+                <div class="editor-toolbar">
+                    <button type="button" class="pill-button" data-insert-page-break>Add page break</button>
+                    <span class="muted-mini">Each page break starts a new reading page for readers.</span>
+                </div>
+                <textarea asp-for="Content" class="form-control editor-textarea" rows="14" data-writing-input></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
 
-    <div class="mb-3">
-        <label>External Purchase URL</label>
-        <input asp-for="ExternalPurchaseUrl" class="form-control" />
-    </div>
+            <div class="mb-3">
+                <label asp-for="AccessType" class="form-label">Access type</label>
+                <select asp-for="AccessType" asp-items="Html.GetEnumSelectList<ContentAccessType>()" class="form-select" data-access-type></select>
+            </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
-</form>
+            <div class="mb-3" data-access-panel="1">
+                <label asp-for="Price" class="form-label">Price</label>
+                <input asp-for="Price" class="form-control" type="number" min="0" step="0.01" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+                <small class="text-muted">Paid releases on Inkspire should keep a strong preview here and a complete PDF attached.</small>
+            </div>
+
+            <div class="mb-3" data-access-panel="2">
+                <label asp-for="ExternalPurchaseUrl" class="form-label">External purchase URL</label>
+                <input asp-for="ExternalPurchaseUrl" class="form-control" />
+                <span asp-validation-for="ExternalPurchaseUrl" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Replace PDF</label>
+                <input type="file" name="pdfFile" class="form-control" accept="application/pdf" />
+                @if (!string.IsNullOrWhiteSpace(Model.PdfPath))
+                {
+                    <small class="text-muted d-block mt-2">A PDF is already attached to this writing.</small>
+                }
+            </div>
+
+            <button type="submit" class="btn btn-brand">Save changes</button>
+        </form>
+
+        <aside class="studio-sidebar">
+            <div class="glass-card guidance-panel">
+                <span class="eyebrow">Commerce note</span>
+                <h2>Make the listing do the right job</h2>
+                <p>
+                    Free works should invite reading immediately. Paid and external works should feel like polished product pages that build desire and direct readers toward purchase.
+                </p>
+                <div class="notice-card">
+                    <strong>Paid-release reminder</strong>
+                    <p class="mb-0">Platform-paid pieces on Inkspire should keep the preview text sharp and the full PDF attached for the purchased edition.</p>
+                </div>
+                <div class="notice-card mt-3">
+                    <strong>Payout flow</strong>
+                    <p class="mb-0">Reader payments now focus on Paystack, and your payout profile is treated as Paystack-ready while Stripe stays parked for any future expansion.</p>
+                </div>
+            </div>
+
+            <div class="glass-card preview-panel">
+                <div class="section-heading">
+                    <div>
+                        <span class="eyebrow">Reading preview</span>
+                        <h2>Review the published feel</h2>
+                    </div>
+                </div>
+                <div class="preview-controls">
+                    <button type="button" class="pill-button active" data-preview-font="classic">Classic</button>
+                    <button type="button" class="pill-button" data-preview-font="book">Book</button>
+                    <button type="button" class="pill-button" data-preview-font="modern">Modern</button>
+                </div>
+                <div class="writing-preview-pages" data-writing-preview></div>
+            </div>
+        </aside>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

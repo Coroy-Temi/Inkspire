@@ -1,49 +1,43 @@
-﻿@model IEnumerable<PoetryPlatform.Web.Models.Comment>
+@model IEnumerable<PoetryPlatform.Web.Models.Comment>
+@{
+    ViewData["Title"] = "Flagged Comments";
+}
 
-<h2>🚩 Flagged Comments</h2>
+<section class="page-hero page-hero--compact">
+    <div>
+        <span class="eyebrow">Moderation</span>
+        <h1>Review flagged comments before they shape the community.</h1>
+    </div>
+</section>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Poem</th>
-            <th>Comment</th>
-            <th>Date</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
+@if (!Model.Any())
+{
+    <div class="empty-state">No flagged comments right now.</div>
+}
+else
+{
+    <div class="stack-list">
         @foreach (var comment in Model)
         {
-            <tr>
-                <td>@comment.Poem.Title</td>
-                <td>@comment.Content</td>
-                <td>@comment.CreatedAt.ToLocalTime()</td>
-                <td>
-                    <form asp-action="DeleteComment"
-                          method="post"
-                          class="d-inline">
+            <article class="stack-card stack-card--large">
+                <div class="stack-card__topline">
+                    <span class="pill-label">@comment.Poem.Title</span>
+                    <span class="muted-mini">@comment.CreatedAt.ToLocalTime().ToString("g")</span>
+                </div>
+                <p class="mb-0">@comment.Content</p>
+                <div class="card-footer-row">
+                    <form asp-action="DeleteComment" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@comment.Id" />
-                        <button class="btn btn-sm btn-danger">
-                            Delete
-                        </button>
+                        <button class="btn btn-outline-danger">Soft delete</button>
                     </form>
-                </td>
-                <td>
-                    <form asp-action="RestoreComment"
-                          method="post"
-                          class="d-inline">
+                    <form asp-action="RestoreComment" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@comment.Id" />
-
-                        <button class="btn btn-sm btn-success">
-                            ♻ Restore
-                        </button>
+                        <button class="btn btn-brand btn-brand--ghost">Restore</button>
                     </form>
-
-                </td>
-
-            </tr>
+                </div>
+            </article>
         }
-    </tbody>
-</table>
+    </div>
+}

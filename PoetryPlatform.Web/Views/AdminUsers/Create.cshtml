@@ -1,14 +1,22 @@
-﻿<h2>Add Admin</h2>
+@{
+    ViewData["Title"] = "Create Admin";
+}
 
-<form method="post">
+<section class="page-hero page-hero--compact">
+    <div>
+        <span class="eyebrow">Admin access</span>
+        <h1>Grant administrator permissions safely.</h1>
+    </div>
+</section>
+
+<form method="post" class="glass-card editor-form compact-form">
     @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
     <div class="mb-3">
-        <label>Email</label>
-        <input name="email" class="form-control" />
+        <label class="form-label">User email</label>
+        <input name="email" class="form-control form-control-lg" placeholder="author@example.com" />
     </div>
 
-    <button class="btn btn-danger">
-        Grant Admin Access
-    </button>
+    <button class="btn btn-brand">Grant admin access</button>
 </form>

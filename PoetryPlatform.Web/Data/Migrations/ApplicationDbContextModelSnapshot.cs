@@ -165,6 +165,11 @@ namespace PoetryPlatform.Web.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
@@ -197,6 +202,12 @@ namespace PoetryPlatform.Web.Data.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<int?>("PreferredCheckoutProvider")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ProfileImagePath")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
@@ -282,6 +293,542 @@ namespace PoetryPlatform.Web.Data.Migrations
                     b.HasIndex("CommentId");
 
                     b.ToTable("CommentFlags");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.AuthorEarning", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("AuthorPayoutAccountId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("AvailableAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("BookOrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("EarnedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ExternalSettlementReference")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("GrossAmount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("NetAmount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PayoutProvider")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("PlatformFeeAmount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorPayoutAccountId");
+
+                    b.HasIndex("BookOrderId")
+                        .IsUnique();
+
+                    b.HasIndex("AuthorId", "Status");
+
+                    b.ToTable("AuthorEarnings");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.AuthorPayoutAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AccountName")
+                        .HasMaxLength(160)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AccountNumber")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BankCode")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BankName")
+                        .HasMaxLength(160)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BusinessName")
+                        .HasMaxLength(160)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("ChargesEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("DetailsSubmitted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastOnboardingAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastOnboardingUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("PayoutsEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PaystackRecipientCode")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PaystackRecipientType")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PaystackSubaccountCode")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PaystackSubaccountId")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RequirementsSummary")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("StripeAccountId")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId", "Provider")
+                        .IsUnique();
+
+                    b.ToTable("AuthorPayoutAccounts");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.BookOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("AuthorNetAmount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BuyerId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CheckoutUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ExternalChargeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ExternalCheckoutSessionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ExternalPaymentIntentId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FailureReason")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("GrossAmount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("PlatformFeeAmount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PoemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("BuyerId");
+
+                    b.HasIndex("OrderNumber")
+                        .IsUnique();
+
+                    b.HasIndex("PoemId", "BuyerId", "Status");
+
+                    b.ToTable("BookOrders");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.PaymentRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("BookOrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ConfirmedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ExternalEventId")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ExternalReference")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ObjectType")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RawPayloadJson")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookOrderId", "ExternalReference");
+
+                    b.ToTable("PaymentRecords");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.PaymentWebhookLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EventId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PayloadJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SignatureHeader")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Provider", "EventId");
+
+                    b.ToTable("PaymentWebhookLogs");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.PayoutBatch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("BatchReference")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BatchReference")
+                        .IsUnique();
+
+                    b.ToTable("PayoutBatches");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.PayoutItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("AuthorEarningId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("AuthorPayoutAccountId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ExternalReference")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ExternalTransferId")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FailureReason")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PayoutBatchId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorEarningId")
+                        .IsUnique();
+
+                    b.HasIndex("AuthorPayoutAccountId");
+
+                    b.HasIndex("PayoutBatchId");
+
+                    b.ToTable("PayoutItems");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.ReaderSubscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("CurrentPeriodEnd")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("CurrentPeriodStart")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ExternalCustomerId")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ExternalSubscriptionId")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReaderId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ReaderSubscriptionPlanId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReaderSubscriptionPlanId");
+
+                    b.HasIndex("ReaderId", "Status");
+
+                    b.ToTable("ReaderSubscriptions");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.ReaderSubscriptionPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IncludesPremiumLibrary")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Interval")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MonthlyReadingCredits")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ReaderSubscriptionPlans");
                 });
 
             modelBuilder.Entity("PoetryPlatform.Web.Models.Poem", b =>
@@ -489,6 +1036,126 @@ namespace PoetryPlatform.Web.Data.Migrations
                     b.Navigation("Comment");
                 });
 
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.AuthorEarning", b =>
+                {
+                    b.HasOne("PoetryPlatform.Web.Models.ApplicationUser", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PoetryPlatform.Web.Models.Payments.AuthorPayoutAccount", "AuthorPayoutAccount")
+                        .WithMany("Earnings")
+                        .HasForeignKey("AuthorPayoutAccountId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("PoetryPlatform.Web.Models.Payments.BookOrder", "BookOrder")
+                        .WithOne()
+                        .HasForeignKey("PoetryPlatform.Web.Models.Payments.AuthorEarning", "BookOrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("AuthorPayoutAccount");
+
+                    b.Navigation("BookOrder");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.AuthorPayoutAccount", b =>
+                {
+                    b.HasOne("PoetryPlatform.Web.Models.ApplicationUser", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.BookOrder", b =>
+                {
+                    b.HasOne("PoetryPlatform.Web.Models.ApplicationUser", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PoetryPlatform.Web.Models.ApplicationUser", "Buyer")
+                        .WithMany()
+                        .HasForeignKey("BuyerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PoetryPlatform.Web.Models.Poem", "Poem")
+                        .WithMany()
+                        .HasForeignKey("PoemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Buyer");
+
+                    b.Navigation("Poem");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.PaymentRecord", b =>
+                {
+                    b.HasOne("PoetryPlatform.Web.Models.Payments.BookOrder", "BookOrder")
+                        .WithMany("PaymentRecords")
+                        .HasForeignKey("BookOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BookOrder");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.PayoutItem", b =>
+                {
+                    b.HasOne("PoetryPlatform.Web.Models.Payments.AuthorEarning", "AuthorEarning")
+                        .WithOne("PayoutItem")
+                        .HasForeignKey("PoetryPlatform.Web.Models.Payments.PayoutItem", "AuthorEarningId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PoetryPlatform.Web.Models.Payments.AuthorPayoutAccount", "AuthorPayoutAccount")
+                        .WithMany("PayoutItems")
+                        .HasForeignKey("AuthorPayoutAccountId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("PoetryPlatform.Web.Models.Payments.PayoutBatch", "PayoutBatch")
+                        .WithMany("Items")
+                        .HasForeignKey("PayoutBatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AuthorEarning");
+
+                    b.Navigation("AuthorPayoutAccount");
+
+                    b.Navigation("PayoutBatch");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.ReaderSubscription", b =>
+                {
+                    b.HasOne("PoetryPlatform.Web.Models.ApplicationUser", "Reader")
+                        .WithMany()
+                        .HasForeignKey("ReaderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PoetryPlatform.Web.Models.Payments.ReaderSubscriptionPlan", "ReaderSubscriptionPlan")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("ReaderSubscriptionPlanId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Reader");
+
+                    b.Navigation("ReaderSubscriptionPlan");
+                });
+
             modelBuilder.Entity("PoetryPlatform.Web.Models.Poem", b =>
                 {
                     b.HasOne("PoetryPlatform.Web.Models.ApplicationUser", "Author")
@@ -539,6 +1206,33 @@ namespace PoetryPlatform.Web.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Poem");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.AuthorEarning", b =>
+                {
+                    b.Navigation("PayoutItem");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.AuthorPayoutAccount", b =>
+                {
+                    b.Navigation("Earnings");
+
+                    b.Navigation("PayoutItems");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.BookOrder", b =>
+                {
+                    b.Navigation("PaymentRecords");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.PayoutBatch", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("PoetryPlatform.Web.Models.Payments.ReaderSubscriptionPlan", b =>
+                {
+                    b.Navigation("Subscriptions");
                 });
 
             modelBuilder.Entity("PoetryPlatform.Web.Models.Poem", b =>

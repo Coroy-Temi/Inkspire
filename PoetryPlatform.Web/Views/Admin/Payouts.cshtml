@@ -1,0 +1,170 @@
+@model PoetryPlatform.Web.Models.Payments.AdminPayoutDashboardVm
+
+@{
+    ViewData["Title"] = "Payouts";
+    var statusMessage = TempData["AdminPayoutStatusMessage"] as string;
+}
+
+@if (!string.IsNullOrWhiteSpace(statusMessage))
+{
+    <div class="notice-card mb-4">
+        <strong>Payout update</strong>
+        <p class="mb-0">@statusMessage</p>
+    </div>
+}
+
+<section class="page-hero page-hero--compact">
+    <div>
+        <span class="eyebrow">Admin payouts</span>
+        <h1>Track earnings, payout readiness, and the commerce rails behind Inkspire.</h1>
+        <p class="lead-copy">Paystack is now the live commerce focus for reader payments, while Stripe stays parked in the codebase and reader subscriptions remain modeled for future rollout.</p>
+    </div>
+</section>
+
+<div class="stats-grid">
+    <article class="stat-card"><strong>@Model.PendingEarningsAmount.ToString("0.##")</strong><span>@Model.PendingEarningsCount pending earnings</span></article>
+    <article class="stat-card"><strong>@Model.AvailableEarningsAmount.ToString("0.##")</strong><span>@Model.AvailableEarningsCount available earnings</span></article>
+    <article class="stat-card"><strong>@Model.InPayoutAmount.ToString("0.##")</strong><span>In payout batches</span></article>
+    <article class="stat-card"><strong>@Model.PaidAmount.ToString("0.##")</strong><span>Paid out</span></article>
+    <article class="stat-card"><strong>@Model.ActivePayoutAccounts</strong><span>Active payout accounts</span></article>
+    <article class="stat-card"><strong>@Model.AutoSettledEarningsAmount.ToString("0.##")</strong><span>@Model.AutoSettledEarningsCount auto-settled by subaccount split</span></article>
+</div>
+
+<section class="two-column-section">
+    <div class="glass-card editor-form">
+        <span class="eyebrow">Routing policy</span>
+        <h2>How payments are flowing</h2>
+        <div class="hero-actions mb-4">
+            <form asp-action="RunAvailablePayouts" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-brand">Run available payout batch</button>
+            </form>
+            <form asp-action="RefreshPayoutTransfers" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-brand btn-brand--ghost">Refresh transfer statuses</button>
+            </form>
+        </div>
+        <div class="detail-grid">
+            <article class="notice-card">
+                <strong>Default checkout provider</strong>
+                <p class="mb-0">@Model.DefaultCheckoutProvider</p>
+            </article>
+            <article class="notice-card">
+                <strong>Checkout routing mode</strong>
+                <p class="mb-0">@Model.CheckoutRoutingMode</p>
+            </article>
+            <article class="notice-card">
+                <strong>Payout provider</strong>
+                <p class="mb-0">@Model.PayoutProvider</p>
+            </article>
+            <article class="notice-card">
+                <strong>Paystack transfers</strong>
+                <p class="mb-0">@(Model.PaystackTransfersConfigured ? "Configured for automated payout batches." : "Not configured yet on this environment.")</p>
+            </article>
+            <article class="notice-card">
+                <strong>Reader subscriptions</strong>
+                <p class="mb-0">@(Model.ReaderSubscriptionsEnabled ? "Enabled in config." : "Prepared in schema, waiting for rollout.")</p>
+            </article>
+        </div>
+    </div>
+
+    <div class="glass-card editor-form">
+        <span class="eyebrow">Future membership layer</span>
+        <h2>Subscription readiness</h2>
+        <div class="stack-list">
+            <article class="stack-card">
+                <h3>@Model.SubscriptionPlanCount plans modeled</h3>
+                <p class="card-meta">Subscription plans already have SQL tables, so reader access tiers can be launched later without replacing the commerce schema.</p>
+            </article>
+            <article class="stack-card">
+                <h3>@Model.ActiveSubscriptions active subscriptions</h3>
+                <p class="card-meta">This is where future recurring reader access will surface once plans and checkout flows are switched on.</p>
+            </article>
+            <article class="stack-card">
+                <h3>@Model.DraftBatches draft batches</h3>
+                <p class="card-meta">@Model.ProcessingBatches payout batches are already processing or waiting for transfer confirmation from Paystack.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Authors needing setup</span>
+            <h2>Who still needs payout onboarding</h2>
+        </div>
+    </div>
+    @if (Model.AuthorsNeedingSetup.Count == 0)
+    {
+        <div class="empty-state">No payout blockers right now. Authors with unpaid balances have active payout setup.</div>
+    }
+    else
+    {
+        <div class="stack-list">
+            @foreach (var author in Model.AuthorsNeedingSetup)
+            {
+                <article class="stack-card">
+                    <div class="stack-card__topline">
+                        <span class="pill-label">@(author.PayoutStatus?.ToString() ?? "NotStarted")</span>
+                        <span class="badge-soft">@author.CountryCode</span>
+                    </div>
+                    <h3>@author.AuthorName</h3>
+                    <div class="metric-row">
+                        <span>@author.Items earnings waiting</span>
+                        <span>@author.Amount.ToString("0.##") due</span>
+                        <span>Checkout pref: @(author.PreferredCheckoutProvider?.ToString() ?? "Routing rule")</span>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</section>
+
+<section class="two-column-section">
+    <div class="glass-card editor-form">
+        <span class="eyebrow">Top earners</span>
+        <h2>Who is driving the most net revenue</h2>
+        <div class="stack-list">
+            @foreach (var author in Model.TopEarningAuthors)
+            {
+                <article class="stack-card">
+                    <h3>@author.AuthorName</h3>
+                    <div class="metric-row">
+                        <span>@author.Items earnings</span>
+                        <span>@author.Amount.ToString("0.##") total net</span>
+                        <span>@(author.PayoutStatus?.ToString() ?? "NotStarted")</span>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+
+    <div class="glass-card editor-form">
+        <span class="eyebrow">Recent payout batches</span>
+        <h2>Batch history</h2>
+        @if (Model.RecentBatches.Count == 0)
+        {
+            <div class="empty-state">No payout batches have been created yet. The tables are ready for the transfer phase.</div>
+        }
+        else
+        {
+            <div class="stack-list">
+                @foreach (var batch in Model.RecentBatches)
+                {
+                    <article class="stack-card">
+                        <div class="stack-card__topline">
+                            <span class="pill-label">@batch.Status</span>
+                            <span class="badge-soft">@batch.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span>
+                        </div>
+                        <h3>@batch.BatchReference</h3>
+                        <div class="metric-row">
+                            <span>@batch.TotalAmount.ToString("0.##") @batch.Currency.ToUpperInvariant()</span>
+                            <span>@batch.Items items</span>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>

@@ -1,156 +1,55 @@
-﻿@model IEnumerable<PoetryPlatform.Web.Models.MostCommentedPoemVm>
+@model IEnumerable<PoetryPlatform.Web.Models.MostCommentedPoemVm>
 
 @{
     ViewData["Title"] = "Most Commented Poems";
 }
 
-<h2 class="mb-4">💬 Most Commented Poems</h2>
+<section class="page-hero page-hero--compact">
+    <div>
+        <span class="eyebrow">Conversation ranking</span>
+        <h1>The poems generating the most discussion.</h1>
+        <p class="lead-copy">Use this view to surface the pieces readers are responding to most deeply.</p>
+    </div>
+</section>
 
-<div class="btn-group mb-4" role="group">
-    <a asp-action="MostCommented"
-       asp-route-days="0"
-       class="btn btn-outline-primary @(ViewBag.Days == 0 ? "active" : "")">
-        All Time
-    </a>
-
-    <a asp-action="MostCommented"
-       asp-route-days="7"
-       class="btn btn-outline-primary @(ViewBag.Days == 7 ? "active" : "")">
-        Last 7 Days
-    </a>
-
-    <a asp-action="MostCommented"
-       asp-route-days="30"
-       class="btn btn-outline-primary @(ViewBag.Days == 30 ? "active" : "")">
-        Last 30 Days
-    </a>
+<div class="filter-pills mb-4">
+    <a asp-action="MostCommented" asp-route-days="0" class="pill-button @(ViewBag.Days == 0 ? "active" : "")">All time</a>
+    <a asp-action="MostCommented" asp-route-days="7" class="pill-button @(ViewBag.Days == 7 ? "active" : "")">Last 7 days</a>
+    <a asp-action="MostCommented" asp-route-days="30" class="pill-button @(ViewBag.Days == 30 ? "active" : "")">Last 30 days</a>
 </div>
 
 @if (!Model.Any())
 {
-    <p class="text-muted">No poems have comments yet.</p>
+    <p class="empty-state">No poems have comments yet.</p>
 }
 else
 {
-    <!-- ========================= -->
-    <!-- DESKTOP TABLE (md+) -->
-    <!-- ========================= -->
-    <table class="table table-striped align-middle d-none d-md-table">
-        <thead>
-            <tr>
-                <th style="width:80px;">Rank</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Comments</th>
-                <th>Published</th>
-                <th></th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @foreach (var poem in Model)
-            {
-                <tr>
-                    <td class="text-center">
-                        @if (poem.Rank == 1)
-                        {
-                            <span class="fs-4">🥇</span>
-                        }
-                        else if (poem.Rank == 2)
-                        {
-                            <span class="fs-4">🥈</span>
-                        }
-                        else if (poem.Rank == 3)
-                        {
-                            <span class="fs-4">🥉</span>
-                        }
-                        else
-                        {
-                            <strong>#@poem.Rank</strong>
-                        }
-                    </td>
-
-                    <td>
-                        <strong>
-                            <a asp-controller="Poems"
-                               asp-action="Read"
-                               asp-route-id="@poem.Id">
-                                @poem.Title
-                            </a>
-                        </strong>
-                    </td>
-
-                    <td>@poem.AuthorName</td>
-
-                    <td>💬 @poem.CommentCount</td>
-
-                    <td>@poem.CreatedAt.ToLocalTime().ToShortDateString()</td>
-
-                    <td>
-                        <a asp-controller="Poems"
-                           asp-action="Read"
-                           asp-route-id="@poem.Id"
-                           class="btn btn-sm btn-outline-primary">
-                            Read
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <!-- ========================= -->
-    <!-- MOBILE CARDS (< md) -->
-    <!-- ========================= -->
-    <div class="d-md-none">
+    <div class="stack-list">
         @foreach (var poem in Model)
         {
-            <div class="card mb-3 shadow-sm">
-                <div class="card-body">
-
-                    <!-- RANK -->
-                    <div class="mb-2">
-                        @if (poem.Rank == 1)
-                        {
-                            <span class="fs-4">🥇</span>
-                        }
-                        else if (poem.Rank == 2)
-                        {
-                            <span class="fs-4">🥈</span>
-                        }
-                        else if (poem.Rank == 3)
-                        {
-                            <span class="fs-4">🥉</span>
-                        }
-                        else
-                        {
-                            <strong>#@poem.Rank</strong>
-                        }
-                    </div>
-
-                    <!-- TITLE -->
-                    <h5 class="mb-1">
-                        <a asp-controller="Poems"
-                           asp-action="Read"
-                           asp-route-id="@poem.Id">
-                            @poem.Title
-                        </a>
-                    </h5>
-
-                    <!-- META -->
-                    <small class="text-muted d-block mb-2">
-                        by @poem.AuthorName · 💬 @poem.CommentCount comments
-                    </small>
-
-                    <!-- ACTION -->
-                    <a asp-controller="Poems"
-                       asp-action="Read"
-                       asp-route-id="@poem.Id"
-                       class="btn btn-sm btn-outline-primary w-100">
-                        Read
-                    </a>
+            var avatarText = string.IsNullOrWhiteSpace(poem.AuthorName) ? "I" : poem.AuthorName.Substring(0, 1).ToUpperInvariant();
+            <article class="stack-card stack-card--large">
+                <div class="stack-card__topline">
+                    <span class="rank-chip">#@poem.Rank</span>
+                    <span class="muted-mini">@poem.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span>
                 </div>
-            </div>
+                <h2>@poem.Title</h2>
+                <div class="author-line">
+                    @if (!string.IsNullOrWhiteSpace(poem.AuthorProfileImagePath))
+                    {
+                        <img src="@poem.AuthorProfileImagePath" alt="@poem.AuthorName" class="author-avatar" />
+                    }
+                    else
+                    {
+                        <span class="author-avatar author-avatar--fallback">@avatarText</span>
+                    }
+                    <p class="card-meta">by @poem.AuthorName</p>
+                </div>
+                <div class="metric-row">
+                    <span>@poem.CommentCount comments</span>
+                </div>
+                <a asp-controller="Poems" asp-action="Read" asp-route-id="@poem.Id" class="link-cta">Read and respond</a>
+            </article>
         }
     </div>
 }
